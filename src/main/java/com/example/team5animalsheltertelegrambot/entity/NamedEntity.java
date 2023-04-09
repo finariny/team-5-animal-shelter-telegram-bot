@@ -1,9 +1,10 @@
 package com.example.team5animalsheltertelegrambot.entity;
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
+
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public class NamedEntity {
+public class NamedEntity extends BaseEntity{
     @Column(name = "name")
     private String name;
 
@@ -13,5 +14,10 @@ public class NamedEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

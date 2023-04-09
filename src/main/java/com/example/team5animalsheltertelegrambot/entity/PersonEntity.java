@@ -1,11 +1,11 @@
 package com.example.team5animalsheltertelegrambot.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotEmpty;
 
 @MappedSuperclass
-public class PersonEntity {
+public class PersonEntity extends BaseEntity{
 
     @NotEmpty
     @Column(name = "first_name")
@@ -51,5 +51,10 @@ public class PersonEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return getLastName() + " " + getFirstName();
     }
 }
