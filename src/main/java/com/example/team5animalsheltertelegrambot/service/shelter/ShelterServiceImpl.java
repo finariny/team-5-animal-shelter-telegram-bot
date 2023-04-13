@@ -1,6 +1,6 @@
 package com.example.team5animalsheltertelegrambot.service.shelter;
 
-import com.example.team5animalsheltertelegrambot.entity.Shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,14 +16,6 @@ import java.nio.file.Path;
 public class ShelterServiceImpl<T extends AnimalShelter> implements ShelterService {
     @Value(value = "${path.to.data.files}")
     private String dataFilePath;
-    @Value(value = "${name.of.DogShelterSchema.data.file}")
-    private String getDogShelterSchemaFileName;
-    @Value(value = "${name.of.CatShelterSchema.data.file}")
-    private String getCatShelterSchemaFileName;
-    @Value(value = "${name.of.RecommendationDogShelter.data.file}")
-    private String getRecommendationDogShelterFileName;
-    @Value(value = "${name.of.RecommendationCatShelter.data.file}")
-    private String getRecommendationCatShelterFileName;
 
 
     @Override
@@ -56,22 +48,7 @@ public class ShelterServiceImpl<T extends AnimalShelter> implements ShelterServi
         return t.getSafetyAdvice();
     }
 
-    @Override
-    public File getDogShelterSchemaDataFile() {
-        return new File(dataFilePath + "/" + getDogShelterSchemaFileName);
-    }
-
-    @Override
-    public void importDogShelterSchemaDataFile(MultipartFile file) throws IOException {
-        cleanDataFile(getDogShelterSchemaFileName);//удаляем дата файл и создаем пустой новый
-        File dataFile = getDogShelterSchemaDataFile();// в новый берем информацию из DogShelterSchemaDataFile
-        try (FileOutputStream fos = new FileOutputStream(dataFile)) {  // открываем исходящий поток
-            IOUtils.copy(file.getInputStream(), fos); // берем входящий поток из @RequestParam и копируем в исходящий поток  'fos'
-        } catch (IOException e) {
-            throw new IOException();
-        }
-    }
-
+    /** =Блок методов по работе с файлами схем проезда к питомцам или файлами рекомендаций для будущих хозяев животны=*/
     @Override
     public boolean cleanDataFile(String filename) {
         try {
@@ -81,7 +58,40 @@ public class ShelterServiceImpl<T extends AnimalShelter> implements ShelterServi
         } catch (IOException e) {
             return false;
         }
-
-
     }
+
+
+    @Override
+    public File getSchemaDataFile(AnimalShelter t) {
+        return new File(dataFilePath + "/" + t.getDrivingDirections());
+    }
+
+    @Override
+    public void importSchemaDataFile(AnimalShelter t, MultipartFile file) throws IOException {
+        cleanDataFile(t.getDrivingDirections());//удаляем дата файл и создаем пустой новый
+        File dataFile = getSchemaDataFile(t);// в новый берем информацию из SchemaDataFile
+        try (FileOutputStream fos = new FileOutputStream(dataFile)) {  // открываем исходящий поток
+            IOUtils.copy(file.getInputStream(), fos); // берем входящий поток из @RequestParam и копируем в исходящий поток  'fos'
+        } catch (IOException e) {
+            throw new IOException();
+        }
+    }
+
+
+    @Override
+    public File getAdviceDataFile(AnimalShelter t) {
+        return new File(dataFilePath + "/" + t.getSafetyAdvice());
+    }
+
+    @Override
+    public void importAdviceDataFile(AnimalShelter t, MultipartFile file) throws IOException {
+        cleanDataFile(t.getSafetyAdvice());
+        File dataFile = getAdviceDataFile(t);
+        try (FileOutputStream fos = new FileOutputStream(dataFile)) {
+            IOUtils.copy(file.getInputStream(), fos);
+        } catch (IOException e) {
+            throw new IOException();
+        }
+    }
+
 }

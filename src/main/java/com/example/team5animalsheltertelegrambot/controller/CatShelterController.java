@@ -1,10 +1,15 @@
 package com.example.team5animalsheltertelegrambot.controller;
 
-import com.example.team5animalsheltertelegrambot.entity.Shelter.CatShelter;
-import com.example.team5animalsheltertelegrambot.entity.Shelter.DogShelter;
+import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/catShelter")
@@ -17,25 +22,55 @@ public class CatShelterController {
         this.shelterService = shelterService;
     }
 
+    /**Контроллер по редактированию названия питомца */
     @PutMapping("/name")
     public String updateName(@RequestParam String name){
         return shelterService.updateName(catShelter, name);
     }
+
+    /**Контроллер по редактированию адреса питомца */
     @PutMapping("/address")
     public String updateAddress(@RequestParam String address){
         return shelterService.updateAddress(catShelter, address);
     }
+
+    /**Контроллер по редактированию контактных данных питомца */
     @PutMapping("/contact")
     public String updateContact(@RequestParam String contact){
         return shelterService.updateContact(catShelter, contact);
     }
-    @PutMapping("/directions")
-    public String updateDirections(@RequestParam String directions){
-        return shelterService.updateDirections(catShelter, directions);
+    /**
+     * Эндпоинт загрузки и замены картинки со схемой проезда к питомцу
+     *
+     * @param file png со схемой проезда к питомцу
+     * @return заменяет сохраненный на жестком (локальном) диске файл со схемой на новый
+     */
+    @PostMapping(value = "/importCatSchema", consumes = (MediaType.IMAGE_PNG_VALUE) )
+    public ResponseEntity<Void> uploadCatSchemaFile(@RequestParam MultipartFile file) {
+        try {
+            shelterService.importSchemaDataFile(catShelter,file);
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-    @PutMapping("/safetyAdvice")
-    public String updateSafetyAdvice(@RequestParam String safetyAdvice){
-        return shelterService.updateSafetyAdvice(catShelter, safetyAdvice);
+
+    /**
+     * Эндпоинт загрузки и замены файла рекомендаций для будущих хозяев животных
+     *
+     * @param file PDF с рекомендациями
+     * @return заменяет сохраненный на жестком (локальном) диске файл PDF
+     */
+    @PostMapping(value = "/importCatAdvice", consumes = (MediaType.APPLICATION_PDF_VALUE) )
+    public ResponseEntity<Void> uploadCatAdviceFile(@RequestParam MultipartFile file) {
+        try {
+            shelterService.importSchemaDataFile(catShelter,file);
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
 

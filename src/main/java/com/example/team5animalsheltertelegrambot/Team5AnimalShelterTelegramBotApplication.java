@@ -1,7 +1,5 @@
 package com.example.team5animalsheltertelegrambot;
 
-import com.example.team5animalsheltertelegrambot.entity.Shelter.CatShelter;
-import com.example.team5animalsheltertelegrambot.entity.Shelter.DogShelter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

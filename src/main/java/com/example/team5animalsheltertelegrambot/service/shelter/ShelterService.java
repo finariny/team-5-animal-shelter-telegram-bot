@@ -1,7 +1,7 @@
 package com.example.team5animalsheltertelegrambot.service.shelter;
 
 
-import com.example.team5animalsheltertelegrambot.entity.Shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -19,9 +19,13 @@ public interface ShelterService <T extends AnimalShelter>{
     String updateSafetyAdvice(AnimalShelter t, String safetyAdvice);
 
 
-    File getDogShelterSchemaDataFile();
+    File getSchemaDataFile(AnimalShelter t);
 
-    void importDogShelterSchemaDataFile(MultipartFile file) throws IOException;
+    void importSchemaDataFile(AnimalShelter t, MultipartFile file) throws IOException;
 
     boolean cleanDataFile(String filename);
+
+    File getAdviceDataFile(AnimalShelter t);
+
+    void importAdviceDataFile(AnimalShelter t, MultipartFile file) throws IOException;
 }
