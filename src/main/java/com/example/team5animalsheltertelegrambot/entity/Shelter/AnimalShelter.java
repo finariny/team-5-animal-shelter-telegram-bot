@@ -11,10 +11,8 @@ import javax.persistence.MappedSuperclass;
 /**
  * This is abstract superClass for Cat and Dog Shelter
  */
-@MappedSuperclass
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+
+
 public abstract class AnimalShelter extends NamedEntity {
     private String address;
     private String workSchedule;
