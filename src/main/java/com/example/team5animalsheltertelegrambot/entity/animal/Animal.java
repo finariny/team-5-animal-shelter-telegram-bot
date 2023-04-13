@@ -2,10 +2,14 @@ package com.example.team5animalsheltertelegrambot.entity.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-@MappedSuperclass
-public abstract class Animal extends NamedEntity {
+import javax.persistence.*;
+
+@Entity
+@Table(name = "animal")
+@DiscriminatorValue(value = "ANIMAL")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
+public class Animal extends NamedEntity {
 
     @Column(name = "age")
     private Integer age;
@@ -42,10 +46,9 @@ public abstract class Animal extends NamedEntity {
 
     @Override
     public String toString() {
-        return "Animal{" +
-                "age=" + age +
-                ", isHealthy=" + isHealthy +
-                ", isVaccinated=" + isVaccinated +
-                '}';
+        return "Имя: " + getName()
+                + ", возраст: " + age
+                + ", состояние здоровья: " + (isVaccinated ? "здоров" : "не здоров")
+                + ", наличие вакцинации: " + (isHealthy ? "вакцинирован" : "не вакцинирован");
     }
 }

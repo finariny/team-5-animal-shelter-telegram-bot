@@ -1,4 +1,4 @@
-package com.example.team5animalsheltertelegrambot.controller;
+package com.example.team5animalsheltertelegrambot.controller.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Dog;
 import com.example.team5animalsheltertelegrambot.service.animal.DogService;
@@ -66,6 +66,10 @@ public class DogController {
 
     @DeleteMapping
     public ResponseEntity<Void> deleteById(@RequestParam Integer id) {
+        Optional<Dog> dog = dogService.findById(id);
+        if (dog.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         dogService.deleteById(id);
         return ResponseEntity.ok().build();
     }
