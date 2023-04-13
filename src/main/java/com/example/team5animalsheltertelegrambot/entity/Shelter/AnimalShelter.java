@@ -13,6 +13,10 @@ import javax.persistence.MappedSuperclass;
  */
 
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
 public abstract class AnimalShelter extends NamedEntity {
     private String address;
     private String workSchedule;

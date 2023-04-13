@@ -13,10 +13,12 @@ import javax.persistence.Table;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class DogShelter extends AnimalShelter{
-    private final String name = "Your true friend";
-    private final String address = "ул. Жумабека Ташенова 15, Астана 020000, Казахстан";
-    private final String drivingDirections = "src/main/resources/ShelterData/TrueFriendSchema.bmp";
-    private final String contact = "Телефон: +7 775 787 2065";
-    private final String safetyAdvice= "src/main/resources/ShelterData/RecommendationDogShelter.pdf";
+    private String name = "Your true friend";
+    private String address = "ул. Жумабека Ташенова 15, Астана 020000, Казахстан";
+    private String drivingDirections = "src/main/resources/ShelterData/TrueFriendSchema.bmp";
+    private String contact = "Телефон: +7 775 787 2065";
+    private String safetyAdvice= "src/main/resources/ShelterData/RecommendationDogShelter.pdf";
+
 }
