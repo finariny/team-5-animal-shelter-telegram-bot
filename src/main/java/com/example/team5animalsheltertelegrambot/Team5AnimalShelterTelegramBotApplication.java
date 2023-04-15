@@ -8,6 +8,8 @@ public class Team5AnimalShelterTelegramBotApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(Team5AnimalShelterTelegramBotApplication.class, args);
+
+
     }
 
 }
