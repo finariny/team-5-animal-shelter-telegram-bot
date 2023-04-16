@@ -2,6 +2,7 @@ package com.example.team5animalsheltertelegrambot.service.report;
 
 import com.example.team5animalsheltertelegrambot.entity.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +25,7 @@ public interface AnimalReportService {
 
    /**
     * Поиск отчета по id.
-    *
+    *@return {@link AnimalReportRepository#findById(Object)}
     * @param id
     */
    public Optional<AnimalReport> findById(Integer id);
@@ -32,6 +33,7 @@ public interface AnimalReportService {
    /**
     * Метод для сохранения отчета.
     * @param report
+    * @return {@link AnimalReportRepository#save(Object)}
     */
    public AnimalReport save(AnimalReport report);
 
@@ -43,6 +45,7 @@ public interface AnimalReportService {
 
    /**
     * Метод для получения всех отчетов.
+    * @return {@link AnimalReportRepository#findAll()}
     */
    public List<AnimalReport> getAll();
 

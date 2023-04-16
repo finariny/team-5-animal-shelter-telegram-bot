@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +22,23 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/reports")
+@Tag(
+        name = "Отчеты",
+        description = "Операции для получения и удаления отчетов"
+)
+@ApiResponses(value = {
+        @ApiResponse(
+                responseCode = "500",
+                description = "Произошла ошибка, не зависящая от вызывающей стороны"
+        )
+})
 public class AnimalReportController {
     private final AnimalReportService animalReportService;
 
     public AnimalReportController(AnimalReportService animalReportService) {
         this.animalReportService = animalReportService;
     }
+
 
     @Operation(summary = "Поиск отчетов по ID.",
             responses = {
