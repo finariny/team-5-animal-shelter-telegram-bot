@@ -10,14 +10,11 @@ import java.util.Optional;
 public interface AnimalReportService {
    /**
     * Загрузка отчета по определенным параметрам.
-    * @param id
     * @param customer
-    * @param pictureFile
-    * @param file
     * @param diet
     * @param wellBeing
     * @param behavior
-    * @param dateSendMessage
+    * @param date
     * @param photo
     */
    public void uploadAnimalReport(Customer customer,
