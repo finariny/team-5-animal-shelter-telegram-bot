@@ -3,6 +3,8 @@ package com.example.team5animalsheltertelegrambot.controller;
 
 import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,9 +14,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+/**
+ * API контроллер для редактирования базовой информации о питомце собак
+ */
 @RestController
 @RequestMapping("/dogShelter")
 @Tag(name="Приют собак", description = "Редактирование информация о приюте для собак")
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Успешный запрос"),
+        @ApiResponse(responseCode = "400", description = "Невалидные параметры запроса"),
+        @ApiResponse(responseCode = "404", description = "Результат запроса не найден"),
+        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка программы")
+})
 public class DogShelterController {
     private ShelterService shelterService;
     private DogShelter dogShelter; // Подтянется ли из этого объекта правильные названия файлов в методах по работе с файлами?
@@ -25,19 +36,19 @@ public class DogShelterController {
 
     /**Контроллер по редактированию названия питомца */
     @PutMapping("/name")
-    public String updateName(@RequestParam String name){
-        return shelterService.updateName(dogShelter, name);
+    public ResponseEntity<String> updateName(@RequestParam String name){
+        return ResponseEntity.ok(shelterService.updateName(dogShelter, name));
     }
     /**Контроллер по редактированию адреса питомца */
     @PutMapping("/address")
-    public String updateAddress(@RequestParam String address){
-        return shelterService.updateAddress(dogShelter, address);
+    public ResponseEntity<String> updateAddress(@RequestParam String address){
+        return ResponseEntity.ok(shelterService.updateAddress(dogShelter, address));
     }
 
     /**Контроллер по редактированию контактных данных питомца */
     @PutMapping("/contact")
-    public String updateContact(@RequestParam String contact){
-        return shelterService.updateContact(dogShelter, contact);
+    public ResponseEntity<String> updateContact(@RequestParam String contact){
+        return ResponseEntity.ok(shelterService.updateContact(dogShelter, contact));
     }
 
     /**
