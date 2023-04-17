@@ -29,10 +29,10 @@ public class AnimalReport extends NamedEntity {
     @Column(name = "date_time")
     private LocalDateTime dateTime;
     @ManyToOne
-    @Column(name = "customer")
+    @JoinColumn(name = "customer_id")
     private Customer customer;
-    @OneToMany
-    @Column(name = "animal")
-    private List<Animal> animal;
+    @ManyToOne
+    @JoinColumn(name = "animal_id")
+    private Animal animal;
 
 }
