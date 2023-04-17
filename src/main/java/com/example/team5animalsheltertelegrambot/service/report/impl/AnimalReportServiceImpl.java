@@ -2,6 +2,7 @@ package com.example.team5animalsheltertelegrambot.service.report.impl;
 
 
 import com.example.team5animalsheltertelegrambot.entity.AnimalReport;
+import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
 import com.example.team5animalsheltertelegrambot.service.report.AnimalReportService;
@@ -30,7 +31,7 @@ public class AnimalReportServiceImpl implements AnimalReportService {
                                    String wellBeing,
                                    String behavior,
                                    LocalDateTime date,
-                                   String photo) {
+                                   String photo, Animal animal) {
         AnimalReport animalReport = new AnimalReport();
         animalReport.setCustomer(customer);
         animalReport.setDateTime(date);
@@ -38,22 +39,30 @@ public class AnimalReportServiceImpl implements AnimalReportService {
         animalReport.setPhoto(photo);
         animalReport.setWellBeing(wellBeing);
         animalReport.setBehavior(behavior);
+        animalReport.setAnimal(animal);
         this.animalReportRepository.save(animalReport);
     }
 
     @Override
     public Optional<AnimalReport> findById(Integer id) {
-        return this.animalReportRepository.findById(id);
+        if (id != null) {
+            return this.animalReportRepository.findById(id);
+        } else {
+            throw new RuntimeException();
+        }
     }
 
     @Override
     public AnimalReport save(AnimalReport report) {
-        return this.animalReportRepository.save(report);
+            return this.animalReportRepository.save(report);
     }
 
     @Override
-    public void remove(Integer id) {
-        this.animalReportRepository.deleteById(id);
+    public Boolean remove(Integer id) {
+        if (id != null) {
+       this.animalReportRepository.deleteById(id);
+        }
+        return true;
     }
 
     @Override

@@ -40,50 +40,63 @@ public class AnimalReportController {
     }
 
 
-    @Operation(summary = "Поиск отчетов по ID.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Отчет по идентификатору получен!",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = AnimalReport.class))
-                    )
-            }
+    @Operation(summary = "Поиск отчетов по ID.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Отчет по идентификатору получен!",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = AnimalReport.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Неверный запрос!"
+            )
+    }
     )
     @GetMapping("/{id}/report/get")
-    public Optional<AnimalReport> downloadReport(@Parameter(description = "report id") @PathVariable Integer id) {
-        return this.animalReportService.findById(id);
+    public ResponseEntity<Optional<AnimalReport>> downloadReport(@Parameter(description = "report id") @PathVariable Integer id) {
+        return ResponseEntity.ok(this.animalReportService.findById(id));
     }
 
-    @Operation(summary = "Удаление отчета по идентификатору",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Отчет удален!",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = AnimalReport.class)
-                            )
-                    )
-            }
+    @Operation(summary = "Удаление отчета по идентификатору.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Отчет удален!",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = AnimalReport.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Неверный запрос!"
+            )
+    }
     )
     @DeleteMapping("/{id}")
-    public void remove(@Parameter(description = "report id") @PathVariable Integer id) {
-        this.animalReportService.remove(id);
+    public ResponseEntity<Boolean> remove(@Parameter(description = "report id") @PathVariable Integer id) {
+        if (this.animalReportService.remove(id)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    @Operation(summary = "Получение коллекции отчетов.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Отчет получен.",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = AnimalReport.class)
-                            )
-                    )
-            }
+    @Operation(summary = "Получение коллекции отчетов.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Отчет получен.",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = AnimalReport.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Неверный запрос!"
+            )
+    }
     )
     @GetMapping("/getAll")
     public ResponseEntity<List<AnimalReport>> getAll() {
