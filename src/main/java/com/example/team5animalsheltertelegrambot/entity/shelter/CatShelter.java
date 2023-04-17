@@ -13,15 +13,13 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class CatShelter extends AnimalShelter{
 
-    //НАДО добавить инициализацию Строк Питомца! .. пока оставил комменты, что бы не потерять информацию
+    //пока оставил комменты, что бы не потерять информацию
     private String name ; //"Pussycat Home"
 
     private String address; //"улица Бейбитшилик 67, Астана 010000, Казахстан"
 
     private String contact;// "Телефон: +7 701 874 3939"
 
-
-    //Товарищи! ) Правильно ли подтянется информация из application.properties?
     @Value(value = "${name.of.CatShelterSchema.data.file}")
     private String drivingDirections;
 

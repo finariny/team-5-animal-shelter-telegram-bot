@@ -37,19 +37,6 @@ public class ShelterServiceImpl<T extends AnimalShelter> implements ShelterServi
     }
 
     @Override
-    public String updateDirections(AnimalShelter t, String directions) {
-        t.setDrivingDirections(directions);
-        return t.getDrivingDirections();
-    }
-
-    @Override
-    public String updateSafetyAdvice(AnimalShelter t, String safetyAdvice) {
-        t.setSafetyAdvice(safetyAdvice);
-        return t.getSafetyAdvice();
-    }
-
-    /** =Блок методов по работе с файлами схем проезда к питомцам или файлами рекомендаций для будущих хозяев животны=*/
-    @Override
     public boolean cleanDataFile(String filename) {
         try {
             Files.deleteIfExists(Path.of(dataFilePath, filename));
