@@ -1,9 +1,16 @@
 package com.example.team5animalsheltertelegrambot.configuration;
 
+import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 
+/**
+ * Перечисление создано для упорядочения команд Бота, а так же
+ * для избежания ошибок и разных трактовок команд
+ *
+ * @see BotCommandService
+ */
 @Getter
 @RequiredArgsConstructor
 public enum CommandType {

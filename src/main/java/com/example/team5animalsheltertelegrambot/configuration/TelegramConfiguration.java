@@ -10,8 +10,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class TelegramConfiguration {
+
     private final TelegramProperties telegramProperties;
 
+    /**
+     * Создает {@link Bean} получив токен из файла свойств
+     *
+     * @return {@link Bean} очищенный от команд Телеграм Бот
+     */
     @Bean
     public TelegramBot telegramBot() {
         TelegramBot bot = new TelegramBot(telegramProperties.token());
