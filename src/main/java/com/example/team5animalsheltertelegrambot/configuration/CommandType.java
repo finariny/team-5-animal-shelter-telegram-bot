@@ -7,10 +7,12 @@ import org.springframework.lang.Nullable;
 @Getter
 @RequiredArgsConstructor
 public enum CommandType {
+    ABOUT("/about", "О программе"),
+    ADOPT("/adopt", "Взять животное из приюта"),
     CATS("/cats", "Приют для кошек"),
     DOGS("/dogs", "Приют для собак"),
-    INFO("/info", "информация о приюте"),
-    ADOPT("/adopt", "Взять животное из приюта"),
+    START("/start", "Добро пожаловать!"),
+    INFO("/info", "Информация о приюте"),
     REPORT("/report", "Отчет о животном"),
     VOLUNTEER("/volunteer", "Позвать волонтера");
 
@@ -31,10 +33,5 @@ public enum CommandType {
             }
         }
         return null;
-    }
-
-    @Override
-    public String toString() {
-        return getDescription();
     }
 }

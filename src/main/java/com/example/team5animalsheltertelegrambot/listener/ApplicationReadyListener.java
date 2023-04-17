@@ -27,6 +27,6 @@ public class ApplicationReadyListener {
     @EventListener(ApplicationReadyEvent.class)
     public void run() {
         System.out.println("Hello P.A.N.K. !!!");
-        telegramBot.execute(new SetMyCommands(menuService.getStartCommands()));
+        telegramBot.execute(new SetMyCommands(menuService.createMainMenuCommands()));
     }
 }

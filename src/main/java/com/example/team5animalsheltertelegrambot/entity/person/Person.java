@@ -17,8 +17,6 @@ public class Person extends BaseEntity {
     @Column(name = "last_name")
     private String lastName;
 
-    private String login;
-
     public String getFirstName() {
         return firstName;
     }

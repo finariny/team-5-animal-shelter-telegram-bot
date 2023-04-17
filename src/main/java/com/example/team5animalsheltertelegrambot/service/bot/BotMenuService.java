@@ -9,5 +9,5 @@ public interface BotMenuService {
      *
      * @return список команд стартового меню
      */
-    public BotCommand[] getStartCommands();
+    public BotCommand[] createMainMenuCommands();
 }
