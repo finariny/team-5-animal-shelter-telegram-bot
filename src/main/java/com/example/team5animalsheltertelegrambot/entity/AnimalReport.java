@@ -1,6 +1,7 @@
 package com.example.team5animalsheltertelegrambot.entity;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,6 +31,8 @@ public class AnimalReport extends NamedEntity {
     @ManyToOne
     @Column(name = "customer")
     private Customer customer;
-    @ManyToOne
-    private Animal animal;
+    @OneToMany
+    @Column(name = "animal")
+    private List<Animal> animal;
+
 }
