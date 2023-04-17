@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class Customer extends Person {
     @Setter
     private Long chatId;
 
-    public Customer(String firstName, String lastName, Long chatId) {
+    public Customer(String firstName, String lastName, @NotNull Long chatId) {
         setFirstName(firstName);
         setLastName(lastName);
         setChatId(chatId);
