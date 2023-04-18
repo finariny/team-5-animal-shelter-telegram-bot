@@ -6,6 +6,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * <pre>
+ * Класс конфигурации Spring:
+ * - включает планировщик заданий;
+ * - указывает корневой пакет сканирования компонентов;
+ * - указывает корневой пакет сканирования сущностей;
+ * - указывает корневой пакет сканирования файлов конфигурации.
+ * </pre>
+ */
 @Configuration
 @EnableScheduling
 @ComponentScan("com.example.team5animalsheltertelegrambot")

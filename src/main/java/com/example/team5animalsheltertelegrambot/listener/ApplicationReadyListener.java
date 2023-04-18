@@ -19,8 +19,8 @@ public class ApplicationReadyListener {
     private final BotMenuService menuService;
 
     /**
-     * Метод будет запущен после всех шагов инициализации по событию ApplicationReadyEvent,
-     * источником которого является SpringApplication.
+     * Метод будет запущен после всех шагов инициализации по событию {@link ApplicationReadyEvent},
+     * источником которого является {@code SpringApplication}.
      * <p>
      * 1. добавляет стартовое меню к телеграм боту.
      */
