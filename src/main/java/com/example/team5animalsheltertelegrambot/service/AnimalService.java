@@ -113,7 +113,7 @@ public class AnimalService<T extends Animal> {
      * @param id идентификатор удаляемой сущности
      */
     public void deleteById(Integer id) {
-        if (id != null) {
+        if (!(id == null || id < 1)) {
             animalRepository.deleteById(id);
         }
     }
