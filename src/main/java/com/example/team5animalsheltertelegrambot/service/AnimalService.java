@@ -25,17 +25,18 @@ public class AnimalService<T extends Animal> {
      * Используется метод репозитория {@link JpaRepository#save(Object)}
      *
      * @param t сохраняемая сущность
-     * @return сохраняемая сущность
+     * @return {@code true} - сущность сохранена, {@code false} - сущность не сохранена
      */
-    public T save(T t) {
+    public boolean save(T t) {
         if (!(t == null
                 || (t.getName() == null || t.getName().isBlank())
                 || (t.getAge() == null || t.getAge() < 0)
                 || t.getHealthy() == null
                 || t.getVaccinated() == null)) {
-            return animalRepository.save(t);
+            animalRepository.save(t);
+            return true;
         }
-        return null;
+        return false;
     }
 
     /**
@@ -69,6 +70,18 @@ public class AnimalService<T extends Animal> {
      */
     public List<T> findAllByVaccinate(Boolean isVaccinated) {
         return animalRepository.findAllByVaccination(isVaccinated);
+    }
+
+    /**
+     * Возвращает список сущностей по значению состояния здоровья и/или значению наличия/отсутствия вакцинации.
+     * Используется метод репозитория {@link AnimalRepository#findAllByHealthAndVaccination(Boolean, Boolean)}
+     *
+     * @param isHealthy    состояние здоровья ({@code true} - здоров, {@code false} - не здоров)
+     * @param isVaccinated наличие вакцинации ({@code true} - вакцинирован, {@code false} - не вакцинирован)
+     * @return список возвращаемых сущностей
+     */
+    public List<T> findAllByHealthAndVaccination(Boolean isHealthy, Boolean isVaccinated) {
+        return animalRepository.findAllByHealthAndVaccination(isHealthy, isVaccinated);
     }
 
     /**
@@ -111,10 +124,14 @@ public class AnimalService<T extends Animal> {
      * Используется метод репозитория {@link JpaRepository#deleteById(Object)}
      *
      * @param id идентификатор удаляемой сущности
+     * @return {@code true} - сущность сохранена, {@code false} - сущность не сохранена
      */
-    public void deleteById(Integer id) {
-        if (!(id == null || id < 1)) {
-            animalRepository.deleteById(id);
+    public Boolean deleteById(Integer id) {
+        Optional<T> findTById = findById(id);
+        if (id == null || findTById.isEmpty()) {
+            return false;
         }
+        animalRepository.deleteById(id);
+        return true;
     }
 }

@@ -34,13 +34,13 @@ public interface AnimalRepository<T extends Animal> extends JpaRepository<T, Int
                        @Param("isVaccinated") Boolean isVaccinated);
 
     /**
-     * Возвращает список сущностей по значению состоянию здоровья
+     * Возвращает список сущностей по значению состояния здоровья
      *
      * @param isHealthy состояние здоровья ({@code true} - здоров, {@code false} - не здоров), не должно быть {@code null}
      * @return список возвращенных сущностей
      */
     @Query(value = "SELECT a FROM Animal a WHERE a.isHealthy = :isHealthy")
-    List<T> findAllByHealth(Boolean isHealthy);
+    List<T> findAllByHealth(@Param("isHealthy") Boolean isHealthy);
 
     /**
      * Возвращает список сущностей по значению наличия/отсутствия вакцинации
@@ -49,5 +49,15 @@ public interface AnimalRepository<T extends Animal> extends JpaRepository<T, Int
      * @return список возвращенных сущностей
      */
     @Query(value = "SELECT a FROM Animal a WHERE a.isVaccinated = :isVaccinated")
-    List<T> findAllByVaccination(Boolean isVaccinated);
+    List<T> findAllByVaccination(@Param("isVaccinated") Boolean isVaccinated);
+
+    /**
+     * Возвращает список сущностей по значению состояния здоровья и/или значению наличия/отсутствия вакцинации
+     *
+     * @param isHealthy    состояние здоровья ({@code true} - здоров, {@code false} - не здоров)
+     * @param isVaccinated наличие вакцинации ({@code true} - вакцинирован, {@code false} - не вакцинирован)
+     * @return список возвращаемых сущностей
+     */
+    @Query(value = "SELECT a FROM Animal a WHERE a.isHealthy = :isHealthy AND a.isVaccinated = :isVaccinated")
+    List<T> findAllByHealthAndVaccination(@Param("isHealthy") Boolean isHealthy, @Param("isVaccinated") Boolean isVaccinated);
 }
