@@ -2,10 +2,14 @@ package com.example.team5animalsheltertelegrambot.service.shelter;
 
 
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -15,35 +19,43 @@ import java.io.IOException;
  *           работу данных методов.
  */
 
-public interface ShelterService <T extends AnimalShelter>{
+public interface ShelterService <T extends AnimalShelter,R extends JpaRepository>{
+
 
     /**
-     * Метод по редактированию названия питомца
+     * Метод находит всех животных в приюте
+     * @param r - должно выступать CatShelterRepository или DogShelterRepository
+     * @return список животных
+     */
+    List findAllAnimalsInShelter(R r);
+
+    /**
+     * Метод по редактированию названия приюта
      * @param name принимает строковое название
      * @return возвращает строку с новым названием
      */
-    String updateName(T t, String name);
+    String updateName(AnimalShelter t, String name);
 
     /**
-     * Метод по редактированию названия питомца
+     * Метод по редактированию адреса приюта
      * @param address принимает строковый адрес
      * @return возвращает строку с новым адресом
      */
-    String updateAddress(T t, String address);
+    String updateAddress(AnimalShelter t, String address);
 
     /**
-     * Метод по редактированию названия питомца
+     * Метод по редактированию контактов приюта
      * @param contact принимает строковые контакты
      * @return возвращает строку с новыми контактами
      */
-    String updateContact(T t, String contact);
+    String updateContact(AnimalShelter t, String contact);
 
 
-/** =Блок методов по работе с файлами схем проезда к питомцам или файлами рекомендаций для будущих хозяев животны=*/
+/** =Блок методов по работе с файлами схем проезда к приюту или файлами рекомендаций для будущих хозяев животных=*/
 
     /**
-     * Заменяет сохраненный на жестком (локальном) диске файл со схемой проезда к питомцу на новый
-     * @param file .png со схемой проезда к питомцу
+     * Заменяет сохраненный на жестком (локальном) диске файл со схемой проезда к приюту на новый
+     * @param file .png со схемой проезда к приюту
      */
     void importSchemaDataFile(AnimalShelter t, MultipartFile file) throws IOException;
 
@@ -58,8 +70,8 @@ public interface ShelterService <T extends AnimalShelter>{
     boolean cleanDataFile(String filename);
 
     /**
-     * Заменяет сохраненный на жестком (локальном) диске файл со схемой проезда к питомцу на новый
-     * @param file .png со схемой проезда к питомцу
+     * Заменяет сохраненный на жестком (локальном) диске файл со схемой проезда к приюту на новый
+     * @param file .png со схемой проезда к приюту
      */
     void importAdviceDataFile(AnimalShelter t, MultipartFile file) throws IOException;
 

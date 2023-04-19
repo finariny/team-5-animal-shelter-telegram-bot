@@ -2,6 +2,7 @@ package com.example.team5animalsheltertelegrambot.controller;
 
 
 import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
+import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * API контроллер для редактирования базовой информации о питомце собак
+ * API контроллер для редактирования базовой информации о приюте собак
  */
 @RestController
 @RequestMapping("/dogShelter")
@@ -28,17 +31,19 @@ import java.io.IOException;
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка программы")
 })
 public class DogShelterController {
-    private ShelterService shelterService;
-    private DogShelter dogShelter; // Подтянется ли из этого объекта правильные названия файлов в методах по работе с файлами?
-    public DogShelterController(ShelterService shelterService) {
+    private final ShelterService shelterService;
+    private DogShelterRepository dogShelterRepository;
+    DogShelter dogShelter; // после внесение в базу Эту сроку поменять на:   DogShelter dogShelter = dogShelterRepository.getReferenceById(0);
+    public DogShelterController(ShelterService shelterService, DogShelterRepository dogShelterRepository) {
         this.shelterService = shelterService;
+        this.dogShelterRepository = dogShelterRepository;
     }
 
 
 
     @PutMapping("/name")
     @Operation(
-            summary = "Контроллер по редактированию названия питомца"
+            summary = "Контроллер по редактированию названия приюта"
     )
     public ResponseEntity<String> updateName(@RequestParam String name){
         return ResponseEntity.ok(shelterService.updateName(dogShelter, name));
@@ -46,7 +51,7 @@ public class DogShelterController {
 
     @PutMapping("/address")
     @Operation(
-            summary = "Контроллер по редактированию адреса питомца "
+            summary = "Контроллер по редактированию адреса приюта"
     )
     public ResponseEntity<String> updateAddress(@RequestParam String address){
         return ResponseEntity.ok(shelterService.updateAddress(dogShelter, address));
@@ -54,7 +59,7 @@ public class DogShelterController {
 
     @PutMapping("/contact")
     @Operation(
-            summary = "Контроллер по редактированию контактных данных питомца "
+            summary = "Контроллер по редактированию контактных данных приюта"
     )
     public ResponseEntity<String> updateContact(@RequestParam String contact){
         return ResponseEntity.ok(shelterService.updateContact(dogShelter, contact));
@@ -63,7 +68,7 @@ public class DogShelterController {
 
     @PostMapping(value = "/importDogSchema", consumes = (MediaType.IMAGE_PNG_VALUE) )
     @Operation(
-            summary = "загрузка и замена файла .png cо схемой проезда к питомцу собак"
+            summary = "загрузка и замена файла .png cо схемой проезда к приюту собак"
     )
     public ResponseEntity<Void> uploadDogSchemaFile(@RequestParam MultipartFile file) {
         try {
