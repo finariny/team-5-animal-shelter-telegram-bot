@@ -1,8 +1,10 @@
-package com.example.team5animalsheltertelegrambot.service.shelter;
+package com.example.team5animalsheltertelegrambot.service.shelter.impl;
 
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,12 +13,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 @Service
-public class ShelterServiceImpl<T extends AnimalShelter> implements ShelterService {
+public class ShelterServiceImpl implements ShelterService {
     @Value(value = "${path.to.data.files}")
     private String dataFilePath;
 
+
+    @Override
+    public List findAllAnimalsInShelter(JpaRepository r) {
+        return r.findAll();
+    }
 
     @Override
     public String updateName(AnimalShelter t, String name) {
