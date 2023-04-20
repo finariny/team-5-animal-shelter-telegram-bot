@@ -1,35 +1,41 @@
 package com.example.team5animalsheltertelegrambot.service.report;
 
-import com.example.team5animalsheltertelegrambot.entity.AnimalReport;
-import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
-import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
+import com.pengrad.telegrambot.model.File;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
 
 public interface AnimalReportService {
+
     /**
      * Загрузка отчета по определенным параметрам.
-     * @param customer
+     * @param customerChatId
+     * @param photoFile
+     * @param file
      * @param diet
      * @param wellBeing
      * @param behavior
-     * @param date
-     * @param photo
+     * @param filePath
+     * @param dateSendMessage
+     * @param timeDate
+     * @param reportDay
      */
-    void uploadAnimalReport(Customer customer,
+    void uploadAnimalReport(Long customerChatId,
+                            byte[] photoFile, File file,
                             String diet, String wellBeing,
-                            String behavior, LocalDateTime date,
-                            String photo, Animal animal);
+                            String behavior, String filePath,
+                            Date dateSendMessage,
+                            Long timeDate,long reportDay);
 
     /**
      * Поиск отчета по id.
      * @param id
      * @return {@link AnimalReportRepository#findById(Object)}
      */
-    Optional<AnimalReport> findById(Integer id);
+    AnimalReport findById(Integer id);
 
     /**
      * Метод для сохранения отчета.
@@ -40,9 +46,10 @@ public interface AnimalReportService {
 
     /**
      * Метод для удаления отчета по идентификатору.
+     *
      * @param id
      */
-    Boolean remove(Integer id);
+    void remove(Integer id);
 
     /**
      * Метод для получения всех отчетов.
