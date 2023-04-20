@@ -42,6 +42,22 @@ public class CatShelterController {
     }
 
 
+    @PostMapping("/name")
+    @Operation(
+            summary = "Контроллер по назначению названия приюта"
+    )
+    public void setName(@RequestParam String name){
+        catShelter.setName(name);
+    }
+
+    @GetMapping("/name")
+    @Operation(
+            summary = "Контроллер по получению названия приюта"
+    )
+    public ResponseEntity<String> getName(){
+        return ResponseEntity.ok(catShelter.getName());
+    }
+
     @PutMapping("/name")
     @Operation(
             summary = "Контроллер по редактированию названия приюта"
@@ -49,6 +65,21 @@ public class CatShelterController {
     public ResponseEntity<String> updateName(@RequestParam String name){
 
         return ResponseEntity.ok(shelterService.updateName(catShelter, name));
+    }
+    @PostMapping("/address")
+    @Operation(
+            summary = "Контроллер по назначению адреса приюта"
+    )
+    public void setAddress(@RequestParam String str){
+        catShelter.setAddress(str);
+    }
+
+    @GetMapping("/address")
+    @Operation(
+            summary = "Контроллер по получению адреса приюта"
+    )
+    public ResponseEntity<String> getAddress(){
+        return ResponseEntity.ok(catShelter.getAddress());
     }
 
 
@@ -60,13 +91,50 @@ public class CatShelterController {
         return ResponseEntity.ok(shelterService.updateAddress(catShelter, address));
     }
 
+    @PostMapping("/contact")
+    @Operation(
+            summary = "Контроллер по назначению телефона приюта"
+    )
+    public void setContact(@RequestParam String str){
+        catShelter.setContacts(str);
+    }
 
+    @GetMapping("/contact")
+    @Operation(
+            summary = "Контроллер по получению телефона приюта"
+    )
+    public ResponseEntity<String> getContact(){
+        return ResponseEntity.ok(catShelter.getContacts());
+    }
     @PutMapping("/contact")
     @Operation(
             summary = "Контроллер по редактированию контактных данных приюта "
     )
     public ResponseEntity<String> updateContact(@RequestParam String contact){
         return ResponseEntity.ok(shelterService.updateContact(catShelter, contact));
+    }
+
+    @PostMapping("/description")
+    @Operation(
+            summary = "Контроллер по назначению описания приюта"
+    )
+    public void setDescription(@RequestParam String str){
+        catShelter.setContacts(str);
+    }
+
+    @GetMapping("/description")
+    @Operation(
+            summary = "Контроллер по получению описания приюта"
+    )
+    public ResponseEntity<String> getDescription(){
+        return ResponseEntity.ok(catShelter.getContacts());
+    }
+    @PutMapping("/description")
+    @Operation(
+            summary = "Контроллер по редактированию контактных данных приюта "
+    )
+    public ResponseEntity<String> updateDescription(@RequestParam String description){
+        return ResponseEntity.ok(shelterService.updateContact(catShelter, description));
     }
 
     @Operation(

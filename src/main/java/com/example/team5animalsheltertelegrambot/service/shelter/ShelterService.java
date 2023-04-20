@@ -23,13 +23,6 @@ public interface ShelterService <T extends AnimalShelter,R extends JpaRepository
 
 
     /**
-     * Метод находит всех животных в приюте
-     * @param r - должно выступать CatShelterRepository или DogShelterRepository
-     * @return список животных
-     */
-    List findAllAnimalsInShelter(R r);
-
-    /**
      * Метод по редактированию названия приюта
      * @param name принимает строковое название
      * @return возвращает строку с новым названием
@@ -50,24 +43,21 @@ public interface ShelterService <T extends AnimalShelter,R extends JpaRepository
      */
     String updateContact(AnimalShelter t, String contact);
 
+    /**
+     * Метод по редактированию описания приюта
+     * @param description принимает строковое описание
+     * @return возвращает строку с новым описанием
+     */
+    String updateDescription(AnimalShelter t, String description);
+
+
 
 /** =Блок методов по работе с файлами схем проезда к приюту или файлами рекомендаций для будущих хозяев животных=*/
-
     /**
      * Заменяет сохраненный на жестком (локальном) диске файл со схемой проезда к приюту на новый
      * @param file .png со схемой проезда к приюту
      */
     void importSchemaDataFile(AnimalShelter t, MultipartFile file) throws IOException;
-
-    /**Вспомогательный класс для работы с файлами Schema*/
-    File getSchemaDataFile(AnimalShelter t);
-
-    /**
-     * Удаление старого файла
-     * @param filename
-     * @return true - если удачно очистили\ false - если возникло исключение
-     */
-    boolean cleanDataFile(String filename);
 
     /**
      * Заменяет сохраненный на жестком (локальном) диске файл со схемой проезда к приюту на новый
@@ -75,6 +65,13 @@ public interface ShelterService <T extends AnimalShelter,R extends JpaRepository
      */
     void importAdviceDataFile(AnimalShelter t, MultipartFile file) throws IOException;
 
-    /**Вспомогательный класс для работы с файлами Advice*/
-    File getAdviceDataFile(AnimalShelter t);
+//    Дублируется с Animal Service
+//    /**
+//     * Метод находит всех животных в приюте
+//     * @param r - должно выступать CatShelterRepository или DogShelterRepository
+//     * @return список животных
+//     */
+//    List<T> findAllAnimalsInShelter(R r);
+
+
 }

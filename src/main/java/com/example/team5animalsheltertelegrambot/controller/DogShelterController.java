@@ -41,31 +41,100 @@ public class DogShelterController {
 
 
 
+    @PostMapping("/name")
+    @Operation(
+            summary = "Контроллер по назначению названия приюта"
+    )
+    public void setName(@RequestParam String name){
+        dogShelter.setName(name);
+    }
+
+    @GetMapping("/name")
+    @Operation(
+            summary = "Контроллер по получению названия приюта"
+    )
+    public ResponseEntity<String> getName(){
+        return ResponseEntity.ok(dogShelter.getName());
+    }
+
     @PutMapping("/name")
     @Operation(
             summary = "Контроллер по редактированию названия приюта"
     )
     public ResponseEntity<String> updateName(@RequestParam String name){
+
         return ResponseEntity.ok(shelterService.updateName(dogShelter, name));
     }
+    @PostMapping("/address")
+    @Operation(
+            summary = "Контроллер по назначению адреса приюта"
+    )
+    public void setAddress(@RequestParam String str){
+        dogShelter.setAddress(str);
+    }
+
+    @GetMapping("/address")
+    @Operation(
+            summary = "Контроллер по получению адреса приюта"
+    )
+    public ResponseEntity<String> getAddress(){
+        return ResponseEntity.ok(dogShelter.getAddress());
+    }
+
 
     @PutMapping("/address")
     @Operation(
-            summary = "Контроллер по редактированию адреса приюта"
+            summary = "Контроллер по редактированию адреса приюта "
     )
     public ResponseEntity<String> updateAddress(@RequestParam String address){
         return ResponseEntity.ok(shelterService.updateAddress(dogShelter, address));
     }
 
+    @PostMapping("/contact")
+    @Operation(
+            summary = "Контроллер по назначению телефона приюта"
+    )
+    public void setContact(@RequestParam String str){
+        dogShelter.setContacts(str);
+    }
+
+    @GetMapping("/contact")
+    @Operation(
+            summary = "Контроллер по получению телефона приюта"
+    )
+    public ResponseEntity<String> getContact(){
+        return ResponseEntity.ok(dogShelter.getContacts());
+    }
     @PutMapping("/contact")
     @Operation(
-            summary = "Контроллер по редактированию контактных данных приюта"
+            summary = "Контроллер по редактированию контактных данных приюта "
     )
     public ResponseEntity<String> updateContact(@RequestParam String contact){
         return ResponseEntity.ok(shelterService.updateContact(dogShelter, contact));
     }
 
+    @PostMapping("/description")
+    @Operation(
+            summary = "Контроллер по назначению описания приюта"
+    )
+    public void setDescription(@RequestParam String str){
+        dogShelter.setContacts(str);
+    }
 
+    @GetMapping("/description")
+    @Operation(
+            summary = "Контроллер по получению описания приюта"
+    )
+    public ResponseEntity<String> getDescription(){
+        return ResponseEntity.ok(dogShelter.getContacts());
+    }
+    @PutMapping("/description")
+    @Operation(
+            summary = "Контроллер по редактированию контактных данных приюта "
+    )
+    public ResponseEntity<String> updateDescription(@RequestParam String description){
+        return ResponseEntity.ok(shelterService.updateContact(dogShelter, description));
+    }
     @PostMapping(value = "/importDogSchema", consumes = (MediaType.IMAGE_PNG_VALUE) )
     @Operation(
             summary = "загрузка и замена файла .png cо схемой проезда к приюту собак"

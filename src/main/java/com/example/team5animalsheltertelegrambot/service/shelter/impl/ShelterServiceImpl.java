@@ -1,6 +1,8 @@
 package com.example.team5animalsheltertelegrambot.service.shelter.impl;
 
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.exceptions.ValidationException;
+import com.example.team5animalsheltertelegrambot.service.ValidationRegularService;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,15 +18,10 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service
-public class ShelterServiceImpl implements ShelterService {
+public class ShelterServiceImpl<T extends AnimalShelter> implements ShelterService {
     @Value(value = "${path.to.data.files}")
     private String dataFilePath;
 
-
-    @Override
-    public List findAllAnimalsInShelter(JpaRepository r) {
-        return r.findAll();
-    }
 
     @Override
     public String updateName(AnimalShelter t, String name) {
@@ -45,7 +42,17 @@ public class ShelterServiceImpl implements ShelterService {
     }
 
     @Override
-    public boolean cleanDataFile(String filename) {
+    public String updateDescription(AnimalShelter t, String description) {
+        t.setDescription(description);
+        return t.getDescription();
+    }
+
+    /**
+     * Внутренний метод для удаления старого файла
+     * @param filename
+     * @return true - если удачно очистили\ false - если возникло исключение
+     */
+    private boolean cleanDataFile(String filename) {
         try {
             Files.deleteIfExists(Path.of(dataFilePath, filename));
             Files.createFile(Path.of(dataFilePath, filename));
@@ -56,8 +63,8 @@ public class ShelterServiceImpl implements ShelterService {
     }
 
 
-    @Override
-    public File getSchemaDataFile(AnimalShelter t) {
+    /**Вспомогательный метод для работы с файлами схем проезда*/
+    private File getSchemaDataFile(AnimalShelter t) {
         return new File(dataFilePath + "/" + t.getDrivingDirections());
     }
 
@@ -72,9 +79,8 @@ public class ShelterServiceImpl implements ShelterService {
         }
     }
 
-
-    @Override
-    public File getAdviceDataFile(AnimalShelter t) {
+    /**Вспомогательный метод для работы с файлами Advice*/
+    private File getAdviceDataFile(AnimalShelter t) {
         return new File(dataFilePath + "/" + t.getSafetyAdvice());
     }
 

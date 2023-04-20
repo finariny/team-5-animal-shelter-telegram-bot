@@ -3,6 +3,8 @@ package com.example.team5animalsheltertelegrambot.entity.shelter;
 import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.person.Employee;
+import com.example.team5animalsheltertelegrambot.exceptions.ValidationException;
+import com.example.team5animalsheltertelegrambot.service.ValidationRegularService;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,7 +16,7 @@ import java.util.List;
 
 
 @Getter
-@Setter
+
 @MappedSuperclass
 public abstract class AnimalShelter extends NamedEntity {
 
@@ -28,7 +30,7 @@ public abstract class AnimalShelter extends NamedEntity {
     private String drivingDirections;
 
     @Column(name = "contacts")
-    private String contacts;
+    private String contacts; //строка обязательно должна содержать номер телефона
 
     @Column(name = "safety_advice")
     private String safetyAdvice;
@@ -47,4 +49,45 @@ public abstract class AnimalShelter extends NamedEntity {
         return getName();
     }
 
+    public void setAddress(String address) {
+        if(!ValidationRegularService.validateBaseStr(address)){
+            throw new ValidationException(address);
+        }
+        this.address = address;
+    }
+
+    public void setWorkSchedule(String workSchedule) {
+        if(!ValidationRegularService.validateBaseStr(workSchedule)){
+            throw new ValidationException(workSchedule);
+        }
+        this.workSchedule = workSchedule;
+    }
+
+    public void setDrivingDirections(String drivingDirections) {
+        if(!ValidationRegularService.validateBaseStr(drivingDirections)){
+            throw new ValidationException(drivingDirections);
+        }
+        this.drivingDirections = drivingDirections;
+    }
+
+    public void setContacts(String contacts) {
+        if(!ValidationRegularService.findValidatePhone(contacts)){
+            throw new ValidationException("Не обнаружен номер телефона в контактах");
+        }
+        this.contacts = contacts;
+    }
+
+    public void setSafetyAdvice(String safetyAdvice) {
+        if(!ValidationRegularService.validateBaseStr(safetyAdvice)){
+            throw new ValidationException(safetyAdvice);
+        }
+        this.safetyAdvice = safetyAdvice;
+    }
+
+    public void setDescription(String description) {
+        if(!ValidationRegularService.validateBaseStr(description)){
+            throw new ValidationException(description);
+        }
+        this.description = description;
+    }
 }
