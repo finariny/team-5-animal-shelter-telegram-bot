@@ -1,9 +1,10 @@
 package com.example.team5animalsheltertelegrambot.repository;
 
-import com.example.team5animalsheltertelegrambot.entity.Employee;
+import com.example.team5animalsheltertelegrambot.entity.person.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+/**
+ * Репозиторий для сотрудника / волонтера
+ */
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 }
