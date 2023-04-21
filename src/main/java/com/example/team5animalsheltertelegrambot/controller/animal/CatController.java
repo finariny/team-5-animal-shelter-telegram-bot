@@ -1,7 +1,7 @@
 package com.example.team5animalsheltertelegrambot.controller.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Cat;
-import com.example.team5animalsheltertelegrambot.service.AnimalService;
+import com.example.team5animalsheltertelegrambot.service.animal.CatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Контроллер для работы с кошками
@@ -33,10 +32,10 @@ import java.util.Optional;
 })
 public class CatController {
 
-    private final AnimalService<Cat> animalService;
+    private final CatService catService;
 
-    public CatController(AnimalService<Cat> animalService) {
-        this.animalService = animalService;
+    public CatController(CatService catService) {
+        this.catService = catService;
     }
 
     @Operation(
@@ -54,7 +53,7 @@ public class CatController {
     })
     @PostMapping
     public ResponseEntity<Boolean> save(@RequestBody Cat cat) {
-        boolean isCatSaved = animalService.save(cat);
+        boolean isCatSaved = catService.save(cat);
         if (isCatSaved) {
             return ResponseEntity.ok().build();
         }
@@ -79,12 +78,8 @@ public class CatController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Cat>> findById(@PathVariable Integer id) {
-        Optional<Cat> cat = animalService.findById(id);
-        if (cat.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(cat);
+    public ResponseEntity<Cat> findById(@PathVariable Integer id) {
+        return ResponseEntity.of(catService.findById(id));
     }
 
     @Operation(
@@ -110,23 +105,24 @@ public class CatController {
             )
     })
     @GetMapping("/filter")
-    public ResponseEntity<List<Cat>> findAllByHealthAndVaccination(@RequestParam(required = false) Boolean isHealthy, @RequestParam(required = false) Boolean isVaccinated) {
+    public ResponseEntity<List<Cat>> findAllByHealthAndVaccination(@RequestParam(required = false) Boolean isHealthy,
+                                                                   @RequestParam(required = false) Boolean isVaccinated) {
         if (isHealthy != null && isVaccinated != null) {
-            List<Cat> listOfCats = animalService.findAllByHealthAndVaccination(isHealthy, isVaccinated);
+            List<Cat> listOfCats = catService.findAllByHealthAndVaccination(isHealthy, isVaccinated);
             if (listOfCats.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
             return ResponseEntity.ok(listOfCats);
         }
         if (isHealthy != null) {
-            List<Cat> listOfCats = animalService.findAllByHealth(isHealthy);
+            List<Cat> listOfCats = catService.findAllByHealth(isHealthy);
             if (listOfCats.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
             return ResponseEntity.ok(listOfCats);
         }
         if (isVaccinated != null) {
-            List<Cat> listOfCats = animalService.findAllByVaccinate(isVaccinated);
+            List<Cat> listOfCats = catService.findAllByVaccinate(isVaccinated);
             if (listOfCats.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
@@ -154,7 +150,7 @@ public class CatController {
     })
     @GetMapping
     public ResponseEntity<List<Cat>> findAll() {
-        List<Cat> listOfCats = animalService.findAll();
+        List<Cat> listOfCats = catService.findAll();
         if (listOfCats.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -180,7 +176,7 @@ public class CatController {
                                               @RequestParam Integer age,
                                               @RequestParam Boolean isHealthy,
                                               @RequestParam Boolean isVaccinated) {
-        Integer number = animalService.updateById(id, name, age, isHealthy, isVaccinated);
+        Integer number = catService.updateById(id, name, age, isHealthy, isVaccinated);
         if (number == 0) {
             return ResponseEntity.badRequest().build();
         }
@@ -202,7 +198,7 @@ public class CatController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteById(@PathVariable Integer id) {
-        boolean isCatDeleted = animalService.deleteById(id);
+        boolean isCatDeleted = catService.deleteById(id);
         if (isCatDeleted) {
             return ResponseEntity.ok().build();
         }
