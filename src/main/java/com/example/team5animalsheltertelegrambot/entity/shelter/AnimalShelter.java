@@ -9,6 +9,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This is superClass for Cat and Dog Shelter
@@ -89,5 +90,19 @@ public abstract class AnimalShelter extends NamedEntity {
             throw new ValidationException(description);
         }
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AnimalShelter that = (AnimalShelter) o;
+        return Objects.equals(address, that.address) && Objects.equals(workSchedule, that.workSchedule) && Objects.equals(drivingDirections, that.drivingDirections) && Objects.equals(contacts, that.contacts) && Objects.equals(safetyAdvice, that.safetyAdvice) && Objects.equals(description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), address, workSchedule, drivingDirections, contacts, safetyAdvice, description);
     }
 }

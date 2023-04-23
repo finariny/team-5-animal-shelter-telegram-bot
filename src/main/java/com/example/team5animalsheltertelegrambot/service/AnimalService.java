@@ -14,11 +14,9 @@ import java.util.Optional;
 @Service
 public class AnimalService<T extends Animal> {
 
-    private final AnimalRepository<T> animalRepository;
+    private AnimalRepository<T> animalRepository;
 
-    public AnimalService(AnimalRepository<T> animalRepository) {
-        this.animalRepository = animalRepository;
-    }
+
 
     /**
      * Сохраняет заданную сущность.

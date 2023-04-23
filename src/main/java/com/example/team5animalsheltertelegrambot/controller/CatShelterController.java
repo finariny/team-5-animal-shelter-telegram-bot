@@ -1,14 +1,19 @@
 package com.example.team5animalsheltertelegrambot.controller;
 
 
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
 import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
 import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,12 +38,41 @@ import java.util.Optional;
 })
 public class CatShelterController {
     private final ShelterService shelterService;
-    private CatShelterRepository catShelterRepository;
-    CatShelter catShelter; // после внесение в базу Эту сроку поменять на:   CatShelter catShelter = catShelterRepository.getReferenceById(0);
 
-    public CatShelterController(ShelterService shelterService, CatShelterRepository catShelterRepository) {
+    @Autowired
+    private  CatShelterRepository catShelterRepository;
+    CatShelter catShelter = new CatShelter();//catShelterRepository.findById
+
+    public CatShelterController(ShelterService shelterService) {
         this.shelterService = shelterService;
-        this.catShelterRepository = catShelterRepository;
+    }
+
+   @GetMapping("/shelter")
+    @Operation(
+            summary = "Контроллер по получению приюта"
+    )
+    public String getShelter(){
+       Optional<CatShelter> catShelter1 = catShelterRepository.findById(1);
+        if (catShelter1.isPresent()) {
+           return catShelter1.get().getName();
+       } else return "I have nothing to say.\n";
+    }
+
+
+
+
+    @Operation(summary = "Добавление приюта кошек")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Приют кошек добавлен",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = Customer.class)))),})
+    @PostMapping
+    public ResponseEntity<CatShelter> save(@RequestBody CatShelter catShelter) {
+        try {
+            return ResponseEntity.ok(catShelterRepository.save(catShelter));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 
@@ -151,7 +185,7 @@ public class CatShelterController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
-    @PostMapping(value = "/importCatAdvice", consumes = (MediaType.APPLICATION_PDF_VALUE) )
+    @PostMapping(value = "/importCatAdvice" )
     @Operation(
             summary = "загрузка и замена файла PDF рекомендаций для будущих хозяев животных"
     )

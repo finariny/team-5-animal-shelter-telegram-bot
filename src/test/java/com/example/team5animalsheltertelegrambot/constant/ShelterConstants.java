@@ -12,6 +12,11 @@ public class ShelterConstants {
     public static final String CORRECT_CONTACT =  "+77757872065";
     public static final String CORRECT_DESCRIPTION = "Это самый крутой приют самых крутых животных!";
 
+    public static final String DEFAULT_NAME = "Котогрызка";
+    public static final String DEFAULT_ADDRESS = "ул. Мужумбека Ташнова 15, Остановка 000000, Кыргызстан";
+    public static final String DEFAULT_CONTACT = "+79999999999";
+    public static final String DEFAULT_DESCRIPTION = "Тест описания";
+
  //   public static final MultipartFile MEDIA_TYPE_PNG = (MultipartFile) new MediaType(IMAGE_PNG_VALUE);
 
 

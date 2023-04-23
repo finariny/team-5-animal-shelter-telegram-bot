@@ -14,11 +14,5 @@ import java.util.List;
 @Repository
 public interface CatShelterRepository extends JpaRepository<CatShelter, Integer> {
 
-    /**
-     * Получение списка всех кошек приюта
-     */
-    @Override
-    @Query(value = "SELECT a FROM CatShelter a LEFT JOIN Cat ")
-    List<CatShelter> findAll();
 
 }

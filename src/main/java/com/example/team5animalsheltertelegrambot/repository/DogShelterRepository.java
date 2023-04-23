@@ -16,12 +16,4 @@ import java.util.List;
 @Repository
 public interface DogShelterRepository extends JpaRepository<DogShelter, Integer> {
 
-    /**
-     * Получение списка всех собак приюта
-     */
-    @Override
-    @Query(value = "SELECT a FROM DogShelter a LEFT JOIN Dog ")
-    List<DogShelter> findAll();
-
-
 }

@@ -3,6 +3,7 @@ package com.example.team5animalsheltertelegrambot.service.shelter;
 
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
+import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +20,10 @@ import java.util.Optional;
  *           работу данных методов.
  */
 
-public interface ShelterService <T extends AnimalShelter,R extends JpaRepository>{
+public interface ShelterService <T extends AnimalShelter,R extends JpaRepository> {
+
+
+
 
 
     /**
