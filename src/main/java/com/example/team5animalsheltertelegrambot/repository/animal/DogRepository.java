@@ -1,19 +1,20 @@
-package com.example.team5animalsheltertelegrambot.repository;
+package com.example.team5animalsheltertelegrambot.repository.animal;
 
-import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
+import com.example.team5animalsheltertelegrambot.entity.animal.Dog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
- * Репозиторий для работы с животными
+ * Репозиторий для работы с собаками
  */
 @Repository
-public interface AnimalRepository<T extends Animal> extends JpaRepository<T, Integer> {
+public interface DogRepository extends JpaRepository<Dog, Integer> {
 
     /**
      * Обновляет сущность по передаваемым параметрам
@@ -25,8 +26,9 @@ public interface AnimalRepository<T extends Animal> extends JpaRepository<T, Int
      * @param isVaccinated наличие вакцинации сущности ({@code true} - вакцинирован, {@code false} - не вакцинирован), не должно быть {@code null}
      * @return число ({@code 1} - сущность обновлена, {@code 0} - сущность не обновлена)
      */
+    @Transactional
     @Modifying
-    @Query(value = "UPDATE Animal SET name = :name, age = :age, isHealthy = :isHealthy, isVaccinated = :isVaccinated WHERE id = :id")
+    @Query(value = "UPDATE Dog SET name = :name, age = :age, isHealthy = :isHealthy, isVaccinated = :isVaccinated WHERE id = :id")
     Integer updateById(@Param("id") Integer id,
                        @Param("name") String name,
                        @Param("age") Integer age,
@@ -34,13 +36,13 @@ public interface AnimalRepository<T extends Animal> extends JpaRepository<T, Int
                        @Param("isVaccinated") Boolean isVaccinated);
 
     /**
-     * Возвращает список сущностей по значению состоянию здоровья
+     * Возвращает список сущностей по значению состояния здоровья
      *
      * @param isHealthy состояние здоровья ({@code true} - здоров, {@code false} - не здоров), не должно быть {@code null}
      * @return список возвращенных сущностей
      */
-    @Query(value = "SELECT a FROM Animal a WHERE a.isHealthy = :isHealthy")
-    List<T> findAllByHealth(Boolean isHealthy);
+    @Query(value = "SELECT d FROM Dog d WHERE d.isHealthy = :isHealthy")
+    List<Dog> findAllByHealth(@Param("isHealthy") Boolean isHealthy);
 
     /**
      * Возвращает список сущностей по значению наличия/отсутствия вакцинации
@@ -48,6 +50,16 @@ public interface AnimalRepository<T extends Animal> extends JpaRepository<T, Int
      * @param isVaccinated наличие вакцинации ({@code true} - вакцинирован, {@code false} - не вакцинирован), не должно быть {@code null}
      * @return список возвращенных сущностей
      */
-    @Query(value = "SELECT a FROM Animal a WHERE a.isVaccinated = :isVaccinated")
-    List<T> findAllByVaccination(Boolean isVaccinated);
+    @Query(value = "SELECT d FROM Dog d WHERE d.isVaccinated = :isVaccinated")
+    List<Dog> findAllByVaccination(@Param("isVaccinated") Boolean isVaccinated);
+
+    /**
+     * Возвращает список сущностей по значению состояния здоровья и/или значению наличия/отсутствия вакцинации
+     *
+     * @param isHealthy    состояние здоровья ({@code true} - здоров, {@code false} - не здоров)
+     * @param isVaccinated наличие вакцинации ({@code true} - вакцинирован, {@code false} - не вакцинирован)
+     * @return список возвращаемых сущностей
+     */
+    @Query(value = "SELECT d FROM Dog d WHERE d.isHealthy = :isHealthy AND d.isVaccinated = :isVaccinated")
+    List<Dog> findAllByHealthAndVaccination(@Param("isHealthy") Boolean isHealthy, @Param("isVaccinated") Boolean isVaccinated);
 }

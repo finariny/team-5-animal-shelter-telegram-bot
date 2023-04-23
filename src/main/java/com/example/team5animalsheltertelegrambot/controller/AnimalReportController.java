@@ -1,7 +1,8 @@
 package com.example.team5animalsheltertelegrambot.controller;
 
-import com.example.team5animalsheltertelegrambot.entity.AnimalReport;
+import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.service.report.AnimalReportService;
+import com.example.team5animalsheltertelegrambot.service.report.impl.AnimalReportServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,9 +34,9 @@ import java.util.Optional;
         )
 })
 public class AnimalReportController {
-    private final AnimalReportService animalReportService;
+    private final AnimalReportServiceImpl animalReportService;
 
-    public AnimalReportController(AnimalReportService animalReportService) {
+    public AnimalReportController(AnimalReportServiceImpl animalReportService) {
         this.animalReportService = animalReportService;
     }
 
@@ -55,8 +56,8 @@ public class AnimalReportController {
             )
     }
     )
-    @GetMapping("/{id}/report/get")
-    public ResponseEntity<Optional<AnimalReport>> downloadReport(@Parameter(description = "report id") @PathVariable Integer id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<AnimalReport> downloadReport(@Parameter(description = "report id") @PathVariable Integer id) {
         return ResponseEntity.ok(this.animalReportService.findById(id));
     }
 
@@ -76,11 +77,13 @@ public class AnimalReportController {
     }
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> remove(@Parameter(description = "report id") @PathVariable Integer id) {
-        if (this.animalReportService.remove(id)) {
+    public ResponseEntity<Void> remove(@Parameter(description = "report id") @PathVariable Integer id) {
+        if (id != null) {
+            animalReportService.remove(id);
             return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @Operation(summary = "Получение коллекции отчетов.")
@@ -98,7 +101,7 @@ public class AnimalReportController {
             )
     }
     )
-    @GetMapping("/getAll")
+    @GetMapping("/")
     public ResponseEntity<List<AnimalReport>> getAll() {
         return ResponseEntity.ok(this.animalReportService.getAll());
     }

@@ -1,7 +1,7 @@
 package com.example.team5animalsheltertelegrambot.controller.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Dog;
-import com.example.team5animalsheltertelegrambot.service.AnimalService;
+import com.example.team5animalsheltertelegrambot.service.animal.DogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Контроллер для работы с собаками
@@ -33,10 +32,10 @@ import java.util.Optional;
 })
 public class DogController {
 
-    private final AnimalService<Dog> animalService;
+    private final DogService dogService;
 
-    public DogController(AnimalService<Dog> animalService) {
-        this.animalService = animalService;
+    public DogController(DogService dogService) {
+        this.dogService = dogService;
     }
 
     @Operation(
@@ -45,11 +44,7 @@ public class DogController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Собака добавлена",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = Dog.class)
-                    )
+                    description = "Собака добавлена"
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -57,12 +52,12 @@ public class DogController {
             )
     })
     @PostMapping
-    public ResponseEntity<Dog> save(@RequestBody Dog dog) {
-        Dog newDog = animalService.save(dog);
-        if (newDog == null) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Boolean> save(@RequestBody Dog dog) {
+        boolean isDogSaved = dogService.save(dog);
+        if (isDogSaved) {
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.ok(newDog);
+        return ResponseEntity.badRequest().build();
     }
 
     @Operation(
@@ -83,16 +78,13 @@ public class DogController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Dog>> findById(@PathVariable Integer id) {
-        Optional<Dog> dog = animalService.findById(id);
-        if (dog.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(dog);
+    public ResponseEntity<Dog> findById(@PathVariable Integer id) {
+        return ResponseEntity.of(dogService.findById(id));
     }
 
     @Operation(
-            summary = "Получение списка собак из приюта, соответствующих переданному в параметре значению состояния здоровья (здоровы/не здоровы)"
+            summary = "Получение списка собак из приюта, соответствующих переданному в параметре значению состояния здоровья (здоровы/не здоровы)" +
+                    " и/или значению наличия/отсутствия вакцинации"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -104,43 +96,39 @@ public class DogController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Собаки не найдены"
-            )
-    })
-    @GetMapping("/byHealth/{isHealthy}")
-    public ResponseEntity<List<Dog>> findAllByHealth(@PathVariable Boolean isHealthy) {
-        List<Dog> listOfDogs = animalService.findAllByHealth(isHealthy);
-        if (listOfDogs.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(listOfDogs);
-    }
-
-    @Operation(
-            summary = "Получение списка собак из приюта, соответствующих переданному в параметре значению наличия/отсутствия вакцинации"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Собаки найдены",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = Dog.class))
-                    )
+                    responseCode = "400",
+                    description = "Параметры запроса отсутствуют"
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Собаки не найдены"
             )
     })
-    @GetMapping("/byVaccinate/{isVaccinated}")
-    public ResponseEntity<List<Dog>> findAllByVaccinate(@PathVariable Boolean isVaccinated) {
-        List<Dog> listOfDogs = animalService.findAllByVaccinate(isVaccinated);
-        if (listOfDogs.isEmpty()) {
-            return ResponseEntity.notFound().build();
+    @GetMapping("/filter")
+    public ResponseEntity<List<Dog>> findAllByHealthAndVaccination(@RequestParam(required = false) Boolean isHealthy,
+                                                                   @RequestParam(required = false) Boolean isVaccinated) {
+        if (isHealthy != null && isVaccinated != null) {
+            List<Dog> listOfDogs = dogService.findAllByHealthAndVaccination(isHealthy, isVaccinated);
+            if (listOfDogs.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(listOfDogs);
         }
-        return ResponseEntity.ok(listOfDogs);
+        if (isHealthy != null) {
+            List<Dog> listOfDogs = dogService.findAllByHealth(isHealthy);
+            if (listOfDogs.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(listOfDogs);
+        }
+        if (isVaccinated != null) {
+            List<Dog> listOfDogs = dogService.findAllByVaccinate(isVaccinated);
+            if (listOfDogs.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(listOfDogs);
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @Operation(
@@ -162,7 +150,7 @@ public class DogController {
     })
     @GetMapping
     public ResponseEntity<List<Dog>> findAll() {
-        List<Dog> listOfDogs = animalService.findAll();
+        List<Dog> listOfDogs = dogService.findAll();
         if (listOfDogs.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -175,11 +163,7 @@ public class DogController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Информация о собаке обновлена",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = Dog.class)
-                    )
+                    description = "Информация о собаке обновлена"
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -187,12 +171,12 @@ public class DogController {
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Dog> updateById(@PathVariable Integer id,
+    public ResponseEntity<Integer> updateById(@PathVariable Integer id,
                                           @RequestParam String name,
                                           @RequestParam Integer age,
                                           @RequestParam Boolean isHealthy,
                                           @RequestParam Boolean isVaccinated) {
-        Integer number = animalService.updateById(id, name, age, isHealthy, isVaccinated);
+        Integer number = dogService.updateById(id, name, age, isHealthy, isVaccinated);
         if (number == 0) {
             return ResponseEntity.badRequest().build();
         }
@@ -205,11 +189,7 @@ public class DogController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Собака удалена",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = Dog.class)
-                    )
+                    description = "Собака удалена"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -218,11 +198,10 @@ public class DogController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Integer id) {
-        Optional<Dog> dog = animalService.findById(id);
-        if (dog.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+        boolean isDogDeleted = dogService.deleteById(id);
+        if (isDogDeleted) {
+            return ResponseEntity.ok().build();
         }
-        animalService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
     }
 }

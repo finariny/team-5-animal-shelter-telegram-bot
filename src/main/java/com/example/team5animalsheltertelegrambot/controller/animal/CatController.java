@@ -1,7 +1,7 @@
 package com.example.team5animalsheltertelegrambot.controller.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Cat;
-import com.example.team5animalsheltertelegrambot.service.AnimalService;
+import com.example.team5animalsheltertelegrambot.service.animal.CatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Контроллер для работы с кошками
@@ -33,10 +32,10 @@ import java.util.Optional;
 })
 public class CatController {
 
-    private final AnimalService<Cat> animalService;
+    private final CatService catService;
 
-    public CatController(AnimalService<Cat> animalService) {
-        this.animalService = animalService;
+    public CatController(CatService catService) {
+        this.catService = catService;
     }
 
     @Operation(
@@ -45,11 +44,7 @@ public class CatController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Кошка добавлена",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = Cat.class)
-                    )
+                    description = "Кошка добавлена"
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -57,12 +52,12 @@ public class CatController {
             )
     })
     @PostMapping
-    public ResponseEntity<Cat> save(@RequestBody Cat cat) {
-        Cat newCat = animalService.save(cat);
-        if (newCat == null) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Boolean> save(@RequestBody Cat cat) {
+        boolean isCatSaved = catService.save(cat);
+        if (isCatSaved) {
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.ok(newCat);
+        return ResponseEntity.badRequest().build();
     }
 
     @Operation(
@@ -83,16 +78,13 @@ public class CatController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Cat>> findById(@PathVariable Integer id) {
-        Optional<Cat> cat = animalService.findById(id);
-        if (cat.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(cat);
+    public ResponseEntity<Cat> findById(@PathVariable Integer id) {
+        return ResponseEntity.of(catService.findById(id));
     }
 
     @Operation(
-            summary = "Получение списка кошек из приюта, соответствующих переданному в параметре значению состояния здоровья (здоровы/не здоровы)"
+            summary = "Получение списка кошек из приюта, соответствующих переданному в параметре значению состояния здоровья (здоровы/не здоровы)" +
+                    " и/или значению наличия/отсутствия вакцинации"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -104,43 +96,39 @@ public class CatController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "404",
-                    description = "Кошки не найдены"
-            )
-    })
-    @GetMapping("/byHealth/{isHealthy}")
-    public ResponseEntity<List<Cat>> findAllByHealth(@PathVariable Boolean isHealthy) {
-        List<Cat> listOfCats = animalService.findAllByHealth(isHealthy);
-        if (listOfCats.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(listOfCats);
-    }
-
-    @Operation(
-            summary = "Получение списка кошек из приюта, соответствующих переданному в параметре значению наличия/отсутствия вакцинации"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Кошки найдены",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = Cat.class))
-                    )
+                    responseCode = "400",
+                    description = "Параметры запроса отсутствуют"
             ),
             @ApiResponse(
                     responseCode = "404",
                     description = "Кошки не найдены"
             )
     })
-    @GetMapping("/byVaccinate/{isVaccinated}")
-    public ResponseEntity<List<Cat>> findAllByVaccinate(@PathVariable Boolean isVaccinated) {
-        List<Cat> listOfCats = animalService.findAllByVaccinate(isVaccinated);
-        if (listOfCats.isEmpty()) {
-            return ResponseEntity.notFound().build();
+    @GetMapping("/filter")
+    public ResponseEntity<List<Cat>> findAllByHealthAndVaccination(@RequestParam(required = false) Boolean isHealthy,
+                                                                   @RequestParam(required = false) Boolean isVaccinated) {
+        if (isHealthy != null && isVaccinated != null) {
+            List<Cat> listOfCats = catService.findAllByHealthAndVaccination(isHealthy, isVaccinated);
+            if (listOfCats.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(listOfCats);
         }
-        return ResponseEntity.ok(listOfCats);
+        if (isHealthy != null) {
+            List<Cat> listOfCats = catService.findAllByHealth(isHealthy);
+            if (listOfCats.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(listOfCats);
+        }
+        if (isVaccinated != null) {
+            List<Cat> listOfCats = catService.findAllByVaccinate(isVaccinated);
+            if (listOfCats.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(listOfCats);
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @Operation(
@@ -162,7 +150,7 @@ public class CatController {
     })
     @GetMapping
     public ResponseEntity<List<Cat>> findAll() {
-        List<Cat> listOfCats = animalService.findAll();
+        List<Cat> listOfCats = catService.findAll();
         if (listOfCats.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -175,11 +163,7 @@ public class CatController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Информация о кошке обновлена",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = Cat.class)
-                    )
+                    description = "Информация о кошке обновлена"
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -187,12 +171,12 @@ public class CatController {
             )
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Cat> updateById(@PathVariable Integer id,
-                                          @RequestParam String name,
-                                          @RequestParam Integer age,
-                                          @RequestParam Boolean isHealthy,
-                                          @RequestParam Boolean isVaccinated) {
-        Integer number = animalService.updateById(id, name, age, isHealthy, isVaccinated);
+    public ResponseEntity<Integer> updateById(@PathVariable Integer id,
+                                              @RequestParam String name,
+                                              @RequestParam Integer age,
+                                              @RequestParam Boolean isHealthy,
+                                              @RequestParam Boolean isVaccinated) {
+        Integer number = catService.updateById(id, name, age, isHealthy, isVaccinated);
         if (number == 0) {
             return ResponseEntity.badRequest().build();
         }
@@ -205,11 +189,7 @@ public class CatController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Кошка удалена",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = Cat.class)
-                    )
+                    description = "Кошка удалена"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -217,12 +197,11 @@ public class CatController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Integer id) {
-        Optional<Cat> cat = animalService.findById(id);
-        if (cat.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Boolean> deleteById(@PathVariable Integer id) {
+        boolean isCatDeleted = catService.deleteById(id);
+        if (isCatDeleted) {
+            return ResponseEntity.ok().build();
         }
-        animalService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
     }
 }
