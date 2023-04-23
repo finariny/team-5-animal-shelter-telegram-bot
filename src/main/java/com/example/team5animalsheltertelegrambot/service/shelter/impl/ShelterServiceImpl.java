@@ -1,12 +1,12 @@
 package com.example.team5animalsheltertelegrambot.service.shelter.impl;
 
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
-import com.example.team5animalsheltertelegrambot.exceptions.ValidationException;
-import com.example.team5animalsheltertelegrambot.service.ValidationRegularService;
+import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
+import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,13 +15,30 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Optional;
 
 @Service
-public class ShelterServiceImpl<T extends AnimalShelter> implements ShelterService {
+public class ShelterServiceImpl implements ShelterService {
+
+    @Autowired
+    private static CatShelterRepository catShelterRepository;
+
     @Value(value = "${path.to.data.files}")
     private String dataFilePath;
 
+
+
+
+//    public static String findAny(){
+//        Optional<CatShelter> catShelter = catShelterRepository.findById(1);
+//        if (catShelter.isPresent()) {
+//            return catShelter.get().getName();
+//        } else return "I have nothing to say.\n";
+//    }
+//    public static void main(String[] args) {
+//
+//        System.out.println(findAny());
+//    }
 
     @Override
     public String updateName(AnimalShelter t, String name) {

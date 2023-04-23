@@ -2,6 +2,7 @@ package com.example.team5animalsheltertelegrambot.listener;
 
 import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.repository.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.pengrad.telegrambot.TelegramBot;
@@ -12,6 +13,7 @@ import com.pengrad.telegrambot.model.Update;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +31,8 @@ public class BotUpdatesListener implements UpdatesListener {
 
     private final TelegramBot telegramBot;
     private final CustomerRepository customerRepository;
+
+
     private final BotCommandService botCommandService;
 
     @PostConstruct

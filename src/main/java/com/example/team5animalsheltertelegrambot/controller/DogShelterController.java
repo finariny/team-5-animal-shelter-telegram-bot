@@ -1,10 +1,15 @@
 package com.example.team5animalsheltertelegrambot.controller;
 
 
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
 import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,14 +37,26 @@ import java.util.Optional;
 })
 public class DogShelterController {
     private final ShelterService shelterService;
-    private DogShelterRepository dogShelterRepository;
+    private final DogShelterRepository dogShelterRepository;
     DogShelter dogShelter; // после внесение в базу Эту сроку поменять на:   DogShelter dogShelter = dogShelterRepository.getReferenceById(0);
     public DogShelterController(ShelterService shelterService, DogShelterRepository dogShelterRepository) {
         this.shelterService = shelterService;
         this.dogShelterRepository = dogShelterRepository;
     }
 
-
+    @Operation(summary = "Добавление приюта собак")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Приют собак добавлен",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = Customer.class)))),})
+    @PostMapping
+    public ResponseEntity<DogShelter> save(@RequestBody DogShelter dogShelter) {
+        try {
+            return ResponseEntity.ok(dogShelterRepository.save(dogShelter));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @PostMapping("/name")
     @Operation(

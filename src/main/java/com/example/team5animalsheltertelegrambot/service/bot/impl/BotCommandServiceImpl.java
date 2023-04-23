@@ -1,12 +1,16 @@
 package com.example.team5animalsheltertelegrambot.service.bot.impl;
 
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
+import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
+import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -14,6 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static com.example.team5animalsheltertelegrambot.configuration.CommandType.*;
 
@@ -23,6 +32,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     private final Logger logger = LoggerFactory.getLogger(BotCommandServiceImpl.class);
 
     private final TelegramBot telegramBot;
+
 
     @Override
     public void runAbout(Customer customer) {
@@ -40,13 +50,20 @@ public class BotCommandServiceImpl implements BotCommandService {
 
     @Override
     public void runCats(Long chatId) {
+        //Отправка картинки
+        sendPhotoCatShelter(chatId);
+        //отображение кнопок
         runDialogAnimalShelter(chatId);
     }
 
     @Override
     public void runDogs(Long chatId) {
+//        CatShelterRepository catShelterRepository = new CatShelterRepository();
+//        CatShelter catShelter= catShelterRepository.findById(0);
+        sendPhotoDogShelter(chatId);
         runDialogAnimalShelter(chatId);
     }
+
 
     @Override
     public void runStart(Long chatId) {
@@ -71,6 +88,7 @@ public class BotCommandServiceImpl implements BotCommandService {
 
     @Override
     public void runInfo() {
+
 
     }
 
@@ -124,6 +142,35 @@ public class BotCommandServiceImpl implements BotCommandService {
         sendMessage.replyMarkup(inlineKeyboardMarkup);
 
         // Отправка сообщения
+
         prepareAndExecuteMessage(sendMessage);
+    }
+
+    //Вспомогательный метод для отправки картинки при выборе приюта:
+    private void sendPhotoCatShelter(Long chatId) {
+        try {
+            byte[] photo = Files.readAllBytes(Paths.get(
+                    BotUpdatesListener.class.getResource("/catShelter.jpg").toURI()));
+            SendPhoto sendPhoto = new SendPhoto(chatId, photo);
+            sendPhoto.caption(
+                    "Приветствуем Вас в "+">>PussyCat home<<"/*catShelter.getName()*/+" приюте!" //TODO подтягивать текущее название приюта
+            );
+            telegramBot.execute(sendPhoto);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private void sendPhotoDogShelter(Long chatId) {
+        try {
+            byte[] photo = Files.readAllBytes(Paths.get(
+                    BotUpdatesListener.class.getResource("/dogShelter.jpg").toURI()));
+            SendPhoto sendPhoto = new SendPhoto(chatId, photo);
+            sendPhoto.caption(
+                    "Приветствуем Вас в "+">>Your true friend<<"+" приюте!" //TODO подтягивать текущее название приюта
+            );
+            telegramBot.execute(sendPhoto);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

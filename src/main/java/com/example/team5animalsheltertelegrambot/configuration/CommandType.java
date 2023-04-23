@@ -21,7 +21,12 @@ public enum CommandType {
     START("/start", "Добро пожаловать!"),
     INFO("/info", "Информация о приюте"),
     REPORT("/report", "Отчет о животном"),
-    VOLUNTEER("/volunteer", "Позвать волонтера");
+    VOLUNTEER("/volunteer", "Позвать волонтера"),
+    SHELTER("/shelter", "О приюте"),
+    LOCATION("/location","расписание работы приюта, адрес и схема проезда"),
+    CONTACT("/contact", "телефон для связи"),
+    ADVICE("/advice","рекомендации для будущих хозяев");
+
 
     private final String command;
     private final String description;
