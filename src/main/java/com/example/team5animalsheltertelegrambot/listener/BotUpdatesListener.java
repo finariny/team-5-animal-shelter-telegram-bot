@@ -4,6 +4,7 @@ import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
+import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
 import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.repository.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Основной класс для работы с Телеграм.
@@ -35,10 +37,10 @@ public class BotUpdatesListener implements UpdatesListener {
     private final TelegramBot telegramBot;
     private final CustomerRepository customerRepository;
     private final BotCommandService botCommandService;
-    @Autowired
-    private CatShelterRepository catShelterRepository;
-    @Autowired
-    private DogShelterRepository dogShelterRepository;
+
+    private final CatShelterRepository catShelterRepository;
+
+    private final DogShelterRepository dogShelterRepository;
 
     AnimalShelter animalShelter = null;
 
@@ -82,15 +84,19 @@ public class BotUpdatesListener implements UpdatesListener {
         Long chatId = callbackQuery.from().id();
         CommandType commandType = CommandType.valueOf(callbackQueryData);
         try {
-            switch (commandType) {            //Дублируется КОД! Ниже такая же обработка команд?
+            switch (commandType) {
                 case CATS -> {
-                    animalShelter = catShelterRepository.getReferenceById(2);
-                    botCommandService.runCats(chatId, animalShelter);
+                    animalShelter = catShelterRepository.findById(2).orElse(null);
+                    botCommandService.runCats(chatId, Optional.ofNullable(animalShelter));
                 }
                 case DOGS -> {
-                    animalShelter = dogShelterRepository.getReferenceById(1);
-                    botCommandService.runDogs(chatId, animalShelter);
+                    animalShelter = dogShelterRepository.findById(1).orElse(null);
+                    botCommandService.runDogs(chatId, Optional.ofNullable(animalShelter));
                 }
+                case INFO -> botCommandService.runInfo(chatId, Optional.ofNullable(animalShelter));
+                case CONTACT -> botCommandService.runContact(chatId, Optional.ofNullable(animalShelter));
+                case ADVICE -> botCommandService.runAdvice(chatId, Optional.ofNullable(animalShelter));
+                case LOCATION -> botCommandService.runLocation(chatId, Optional.ofNullable(animalShelter));
             }
         } catch (Exception e) {
             logger.error("Ошибка обработки обратного вызова: {}", e.getMessage());
@@ -128,13 +134,13 @@ public class BotUpdatesListener implements UpdatesListener {
                 switch (commandType) {
                     case ABOUT -> botCommandService.runAbout(customer);
                     case ADOPT -> botCommandService.runAdopt();
-                    case CATS -> {  //Дублируется КОД! Выше такая же обработка команд?
-                        animalShelter= catShelterRepository.getReferenceById(2);     //Перезапишет ли он null за рамками этого блока{}?
-                        botCommandService.runCats(chatId,animalShelter);
+                    case CATS -> {
+                        animalShelter= catShelterRepository.findById(2).orElse(null);     //Перезапишет ли он null за рамками этого блока{}?
+                        botCommandService.runCats(chatId, Optional.ofNullable(animalShelter));
                     }
                     case DOGS -> {
                         animalShelter= dogShelterRepository.getReferenceById(1);
-                        botCommandService.runDogs(chatId,animalShelter);
+                        botCommandService.runDogs(chatId, Optional.of(animalShelter));
                     }
                     case START -> {
                         if (isNewCustomer) {
@@ -142,12 +148,12 @@ public class BotUpdatesListener implements UpdatesListener {
                         }
                         botCommandService.runStart(chatId);
                     }
-                    case INFO -> botCommandService.runInfo(chatId,animalShelter);
+                    case INFO -> botCommandService.runInfo(chatId, Optional.ofNullable(animalShelter));
                     case REPORT -> botCommandService.runReport();
                     case VOLUNTEER -> botCommandService.runVolunteer();
-                    case CONTACT -> botCommandService.runContact(chatId,animalShelter);
-                    case ADVICE -> botCommandService.runAdvice(chatId,animalShelter);
-                    case LOCATION -> botCommandService.runLocation(chatId,animalShelter);
+                    case CONTACT -> botCommandService.runContact(chatId, Optional.ofNullable(animalShelter));
+                    case ADVICE -> botCommandService.runAdvice(chatId, Optional.ofNullable(animalShelter));
+                    case LOCATION -> botCommandService.runLocation(chatId, Optional.ofNullable(animalShelter));
 
                 }
             }

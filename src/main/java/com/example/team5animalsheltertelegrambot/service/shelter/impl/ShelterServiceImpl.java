@@ -20,24 +20,17 @@ import java.util.Optional;
 @Service
 public class ShelterServiceImpl implements ShelterService {
 
-    @Autowired
-    private static CatShelterRepository catShelterRepository;
-
     @Value(value = "${path.to.data.files}")
     private String dataFilePath;
 
 
 
-
-//    public static String findAny(){
+//
+//    public String findAny(){
 //        Optional<CatShelter> catShelter = catShelterRepository.findById(1);
 //        if (catShelter.isPresent()) {
 //            return catShelter.get().getName();
 //        } else return "I have nothing to say.\n";
-//    }
-//    public static void main(String[] args) {
-//
-//        System.out.println(findAny());
 //    }
 
     @Override
