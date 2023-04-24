@@ -21,7 +21,7 @@ import java.util.Optional;
 @Service
 public class AnimalReportServiceImpl implements AnimalReportService {
 
-    private AnimalReportRepository animalReportRepository;
+    private final AnimalReportRepository animalReportRepository;
 
     public AnimalReportServiceImpl(AnimalReportRepository animalReportRepository) {
         this.animalReportRepository = animalReportRepository;
@@ -36,16 +36,16 @@ public class AnimalReportServiceImpl implements AnimalReportService {
                                    Long timeDate, long reportDay) {
 
         AnimalReport animalReport = new AnimalReport();
-        animalReport.setChatId(customerChatId);
-        animalReport.setPhotoFile(photoFile);
-        animalReport.setFileSize(file.fileSize());
-        animalReport.setDateTime(dateSendMessage);
+//        animalReport.setChatId(customerChatId);
+//        animalReport.setPhotoFile(photoFile);
+//        animalReport.setFileSize(file.fileSize());
+//        animalReport.setDateTime(dateSendMessage);
         animalReport.setDiet(diet);
         animalReport.setWellBeing(wellBeing);
         animalReport.setBehavior(behavior);
         animalReport.setPhoto(filePath);
-        animalReport.setTimeDate(timeDate);
-        animalReport.setReportDay(reportDay);
+//        animalReport.setTimeDate(timeDate);
+//        animalReport.setReportDay(reportDay);
         this.animalReportRepository.save(animalReport);
     }
 

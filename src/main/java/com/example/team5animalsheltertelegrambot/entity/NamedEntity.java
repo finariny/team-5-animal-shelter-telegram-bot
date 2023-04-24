@@ -7,7 +7,8 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public class NamedEntity extends BaseEntity{
+public class NamedEntity extends BaseEntity {
+
     @Column(name = "name")
     private String name;
 
@@ -16,7 +17,7 @@ public class NamedEntity extends BaseEntity{
     }
 
     public void setName(String name) {
-        if(!ValidationRegularService.validateBaseStr(name)){
+        if (!ValidationRegularService.validateBaseStr(name)) {
             throw new ValidationException(name);
         }
         this.name = name;

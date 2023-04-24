@@ -98,7 +98,7 @@ public class BotUpdatesListener implements UpdatesListener {
             Customer customer;
 
             if (customerRepository.existsByChatId(chatId)) {
-                customer = customerRepository.findByChatId(chatId);
+                customer = customerRepository.findByChatId(chatId).orElseThrow();
             } else {
                 isNewCustomer = true;
                 customer = customerRepository.save(

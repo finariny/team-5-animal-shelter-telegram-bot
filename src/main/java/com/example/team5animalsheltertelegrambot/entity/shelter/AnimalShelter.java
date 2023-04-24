@@ -5,7 +5,6 @@ import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.person.Employee;
 import com.example.team5animalsheltertelegrambot.exceptions.ValidationException;
 import com.example.team5animalsheltertelegrambot.service.ValidationRegularService;
-import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,82 +13,123 @@ import java.util.Objects;
 /**
  * This is superClass for Cat and Dog Shelter
  */
+@Entity
+@DiscriminatorValue("ASH")
+@Table(name = "ANIMAL_SHELTER")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
+public class AnimalShelter extends NamedEntity {
 
-
-@Getter
-
-@MappedSuperclass
-public abstract class AnimalShelter extends NamedEntity {
-
-    @Column(name = "address")
+    @Column(name = "ADDRESS")
     private String address;
 
-    @Column(name = "work_schedule")
+    @Column(name = "WORK_SCHEDULE")
     private String workSchedule;
 
-    @Column(name = "driving_directions")
+    @Column(name = "DRIVING_DIRECTIONS")
     private String drivingDirections;
 
-    @Column(name = "contacts")
+    @Column(name = "CONTACTS")
     private String contacts; //строка обязательно должна содержать номер телефона
 
-    @Column(name = "safety_advice")
+    @Column(name = "SAFETY_ADVICE")
     private String safetyAdvice;
 
-    @Column(name = "description")
+    @Column(name = "DESCRIPTION")
     private String description;
 
-    @OneToMany
+    @JoinTable(name = "ANIMAL_SHELTER_CUSTOMER_LINK",
+            joinColumns = @JoinColumn(name = "ANIMAL_SHELTER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "CUSTOMER_ID"))
+    @ManyToMany
     private List<Customer> customers;
 
-    @OneToMany
+    @JoinTable(name = "ANIMAL_SHELTER_EMPLOYEE_LINK",
+            joinColumns = @JoinColumn(name = "ANIMAL_SHELTER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "EMPLOYEE_ID"))
+    @ManyToMany
     private List<Employee> employees;
 
-    @Override
-    public String toString() {
-        return getName();
+    public String getAddress() {
+        return address;
     }
 
     public void setAddress(String address) {
-        if(!ValidationRegularService.validateBaseStr(address)){
+        if (!ValidationRegularService.validateBaseStr(address)) {
             throw new ValidationException(address);
         }
         this.address = address;
     }
 
+    public String getWorkSchedule() {
+        return workSchedule;
+    }
+
     public void setWorkSchedule(String workSchedule) {
-        if(!ValidationRegularService.validateBaseStr(workSchedule)){
+        if (!ValidationRegularService.validateBaseStr(workSchedule)) {
             throw new ValidationException(workSchedule);
         }
         this.workSchedule = workSchedule;
     }
 
+    public String getDrivingDirections() {
+        return drivingDirections;
+    }
+
     public void setDrivingDirections(String drivingDirections) {
-        if(!ValidationRegularService.validateBaseStr(drivingDirections)){
+        if (!ValidationRegularService.validateBaseStr(drivingDirections)) {
             throw new ValidationException(drivingDirections);
         }
         this.drivingDirections = drivingDirections;
     }
 
+    public String getContacts() {
+        return contacts;
+    }
+
     public void setContacts(String contacts) {
-        if(!ValidationRegularService.findValidatePhone(contacts)){
+        if (!ValidationRegularService.findValidatePhone(contacts)) {
             throw new ValidationException("Не обнаружен номер телефона в контактах");
         }
         this.contacts = contacts;
     }
 
+    public String getSafetyAdvice() {
+        return safetyAdvice;
+    }
+
     public void setSafetyAdvice(String safetyAdvice) {
-        if(!ValidationRegularService.validateBaseStr(safetyAdvice)){
+        if (!ValidationRegularService.validateBaseStr(safetyAdvice)) {
             throw new ValidationException(safetyAdvice);
         }
         this.safetyAdvice = safetyAdvice;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(String description) {
-        if(!ValidationRegularService.validateBaseStr(description)){
+        if (!ValidationRegularService.validateBaseStr(description)) {
             throw new ValidationException(description);
         }
         this.description = description;
+    }
+
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
+    }
+
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
     }
 
     @Override
@@ -104,5 +144,10 @@ public abstract class AnimalShelter extends NamedEntity {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), address, workSchedule, drivingDirections, contacts, safetyAdvice, description);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }
