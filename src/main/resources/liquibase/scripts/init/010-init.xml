@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
+objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="1" author="team5animalsheltertelegrambot">
+        <createTable tableName="ANIMAL">
+            <column autoIncrement="true" name="ID" startWith="1" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ANIMAL"/>
+            </column>
+            <column name="DTYPE" type="VARCHAR(31)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="AGE" type="INT"/>
+            <column name="IS_HEALTHY" type="BOOLEAN"/>
+            <column name="IS_VACCINATED" type="BOOLEAN"/>
+            <column name="DOG_SHELTER_ID" type="INT"/>
+            <column name="CAT_SHELTER_ID" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2" author="team5animalsheltertelegrambot">
+        <createTable tableName="ANIMAL_REPORT">
+            <column autoIncrement="true" name="ID" startWith="1" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ANIMAL_REPORT"/>
+            </column>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="PHOTO" type="VARCHAR(255)"/>
+            <column name="DIET" type="VARCHAR(255)"/>
+            <column name="WELL_BEING" type="VARCHAR(255)"/>
+            <column name="BEHAVIOR" type="VARCHAR(255)"/>
+            <column name="DATE_CREATE" type="DATETIME"/>
+            <column name="ANIMAL_ID" type="INT"/>
+            <column name="CUSTOMER_ID" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="3" author="team5animalsheltertelegrambot">
+        <createTable tableName="ANIMAL_SHELTER">
+            <column autoIncrement="true" name="ID" startWith="1" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ANIMAL_SHELTER"/>
+            </column>
+            <column name="DTYPE" type="VARCHAR(31)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="ADDRESS" type="VARCHAR(255)"/>
+            <column name="WORK_SCHEDULE" type="VARCHAR(255)"/>
+            <column name="DRIVING_DIRECTIONS" type="VARCHAR(255)"/>
+            <column name="CONTACTS" type="VARCHAR(255)"/>
+            <column name="SAFETY_ADVICE" type="VARCHAR(255)"/>
+            <column name="DESCRIPTION" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="4" author="team5animalsheltertelegrambot">
+        <createTable tableName="ANIMAL_SHELTER_CUSTOMER_LINK">
+            <column name="ANIMAL_SHELTER_ID" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ANIMAL_SHELTER_CUSTOMER_LINK"/>
+            </column>
+            <column name="CUSTOMER_ID" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ANIMAL_SHELTER_CUSTOMER_LINK"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="5" author="team5animalsheltertelegrambot">
+        <createTable tableName="ANIMAL_SHELTER_EMPLOYEE_LINK">
+            <column name="ANIMAL_SHELTER_ID" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ANIMAL_SHELTER_EMPLOYEE_LINK"/>
+            </column>
+            <column name="EMPLOYEE_ID" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ANIMAL_SHELTER_EMPLOYEE_LINK"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="6" author="team5animalsheltertelegrambot">
+        <createTable tableName="PERSON">
+            <column autoIncrement="true" name="ID" startWith="1" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_PERSON"/>
+            </column>
+            <column name="DTYPE" type="VARCHAR(31)"/>
+            <column name="FIRST_NAME" type="VARCHAR(255)"/>
+            <column name="LAST_NAME" type="VARCHAR(255)"/>
+            <column name="CHAT_ID" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="7" author="team5animalsheltertelegrambot">
+        <createIndex indexName="IDX_ANIMAL_CAT_SHELTER" tableName="ANIMAL">
+            <column name="CAT_SHELTER_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="CAT_SHELTER_ID" baseTableName="ANIMAL"
+                                 constraintName="FK_ANIMAL_ON_CAT_SHELTER" referencedColumnNames="ID"
+                                 referencedTableName="ANIMAL_SHELTER"/>
+    </changeSet>
+    <changeSet id="8" author="team5animalsheltertelegrambot">
+        <createIndex indexName="IDX_ANIMAL_DOG_SHELTER" tableName="ANIMAL">
+            <column name="DOG_SHELTER_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="DOG_SHELTER_ID" baseTableName="ANIMAL"
+                                 constraintName="FK_ANIMAL_ON_DOG_SHELTER" referencedColumnNames="ID"
+                                 referencedTableName="ANIMAL_SHELTER"/>
+    </changeSet>
+    <changeSet id="9" author="team5animalsheltertelegrambot">
+        <createIndex indexName="IDX_ANIMAL_REPORT_ANIMAL" tableName="ANIMAL_REPORT">
+            <column name="ANIMAL_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="ANIMAL_ID" baseTableName="ANIMAL_REPORT"
+                                 constraintName="FK_ANIMAL_REPORT_ON_ANIMAL" referencedColumnNames="ID"
+                                 referencedTableName="ANIMAL"/>
+    </changeSet>
+    <changeSet id="10" author="team5animalsheltertelegrambot">
+        <createIndex indexName="IDX_ANIMAL_REPORT_CUSTOMER" tableName="ANIMAL_REPORT">
+            <column name="CUSTOMER_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="CUSTOMER_ID" baseTableName="ANIMAL_REPORT"
+                                 constraintName="FK_ANIMAL_REPORT_ON_CUSTOMER" referencedColumnNames="ID"
+                                 referencedTableName="PERSON"/>
+    </changeSet>
+    <changeSet id="11" author="team5animalsheltertelegrambot">
+        <addForeignKeyConstraint baseColumnNames="ANIMAL_SHELTER_ID" baseTableName="ANIMAL_SHELTER_CUSTOMER_LINK"
+                                 constraintName="FK_ANISHECUS_ON_ANIMAL_SHELTER" referencedColumnNames="ID"
+                                 referencedTableName="ANIMAL_SHELTER"/>
+    </changeSet>
+    <changeSet id="12" author="team5animalsheltertelegrambot">
+        <addForeignKeyConstraint baseColumnNames="CUSTOMER_ID" baseTableName="ANIMAL_SHELTER_CUSTOMER_LINK"
+                                 constraintName="FK_ANISHECUS_ON_CUSTOMER" referencedColumnNames="ID"
+                                 referencedTableName="PERSON"/>
+    </changeSet>
+    <changeSet id="13" author="team5animalsheltertelegrambot">
+        <addForeignKeyConstraint baseColumnNames="ANIMAL_SHELTER_ID" baseTableName="ANIMAL_SHELTER_EMPLOYEE_LINK"
+                                 constraintName="FK_ANISHEEMP_ON_ANIMAL_SHELTER" referencedColumnNames="ID"
+                                 referencedTableName="ANIMAL_SHELTER"/>
+    </changeSet>
+    <changeSet id="14" author="team5animalsheltertelegrambot">
+        <addForeignKeyConstraint baseColumnNames="EMPLOYEE_ID" baseTableName="ANIMAL_SHELTER_EMPLOYEE_LINK"
+                                 constraintName="FK_ANISHEEMP_ON_EMPLOYEE" referencedColumnNames="ID"
+                                 referencedTableName="PERSON"/>
+    </changeSet>
+</databaseChangeLog>
