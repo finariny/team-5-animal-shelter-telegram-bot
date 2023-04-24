@@ -2,6 +2,7 @@ package com.example.team5animalsheltertelegrambot.service.bot;
 
 import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 
 import javax.validation.constraints.NotNull;
 
@@ -28,14 +29,14 @@ public interface BotCommandService {
      *
      * @param chatId идентификатор чата Телеграм
      */
-    void runCats(Long chatId);
+    void runCats(Long chatId,AnimalShelter shelter);
 
     /**
      * Выводит клавиатуру с командами для работы с приютом для собак
      *
      * @param chatId  идентификатор чата Телеграм
      */
-    void runDogs(Long chatId);
+    void runDogs(Long chatId,AnimalShelter shelter);
 
     /**
      * Стартует работу, предоставляет выбор приюта
@@ -47,7 +48,7 @@ public interface BotCommandService {
     /**
      * Выводит информацию о приюте
      */
-    void runInfo();
+    void runInfo(Long chatId,AnimalShelter shelter);
 
     /**
      * Запускает интерфейс для отчета
@@ -58,6 +59,11 @@ public interface BotCommandService {
      * Вызывает волонтера
      */
     void runVolunteer();
+
+    void runContact(Long chatId, AnimalShelter shelter);
+    void runAdvice(Long chatId, AnimalShelter shelter);
+
+    void runLocation(Long chatId, AnimalShelter shelter);
 
     /**
      * Выводит текстовое сообщение с форматированием в Markdown (обрезок телеграмовский)

@@ -1,7 +1,7 @@
 package com.example.team5animalsheltertelegrambot.controller;
 
+
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
-import com.example.team5animalsheltertelegrambot.service.report.AnimalReportService;
 import com.example.team5animalsheltertelegrambot.service.report.impl.AnimalReportServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

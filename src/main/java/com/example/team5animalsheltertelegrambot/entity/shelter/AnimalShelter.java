@@ -38,6 +38,10 @@ public class AnimalShelter extends NamedEntity {
     @Column(name = "DESCRIPTION")
     private String description;
 
+    @Column(name = "IMAGE_NAME")
+    private String imageName;
+
+
     @JoinTable(name = "ANIMAL_SHELTER_CUSTOMER_LINK",
             joinColumns = @JoinColumn(name = "ANIMAL_SHELTER_ID"),
             inverseJoinColumns = @JoinColumn(name = "CUSTOMER_ID"))
@@ -49,6 +53,9 @@ public class AnimalShelter extends NamedEntity {
             inverseJoinColumns = @JoinColumn(name = "EMPLOYEE_ID"))
     @ManyToMany
     private List<Employee> employees;
+
+    public AnimalShelter() {
+    }
 
     public String getAddress() {
         return address;
@@ -92,6 +99,14 @@ public class AnimalShelter extends NamedEntity {
             throw new ValidationException("Не обнаружен номер телефона в контактах");
         }
         this.contacts = contacts;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public String getSafetyAdvice() {
