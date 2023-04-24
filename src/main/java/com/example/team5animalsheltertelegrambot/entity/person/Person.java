@@ -5,16 +5,16 @@ import com.example.team5animalsheltertelegrambot.entity.BaseEntity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ast_person")
+@Table(name = "PERSON")
 @DiscriminatorValue("PERSON")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
 public class Person extends BaseEntity {
 
-    @Column(name = "first_name")
+    @Column(name = "FIRST_NAME")
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "LAST_NAME")
     private String lastName;
 
     public String getFirstName() {

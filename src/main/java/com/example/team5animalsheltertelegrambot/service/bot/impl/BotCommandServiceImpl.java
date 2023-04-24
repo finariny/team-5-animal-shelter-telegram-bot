@@ -35,7 +35,7 @@ public class BotCommandServiceImpl implements BotCommandService {
 
 
     @Override
-    public void runAbout(Customer customer) {
+    public void runAbout(@NotNull Customer customer) {
         String welcomeMessage = String.format("""
                         *Добро пожаловать, %s %s*\\!
                         Вас приветствует _*бот*_, который поможет сделать доброе дело\\.""",

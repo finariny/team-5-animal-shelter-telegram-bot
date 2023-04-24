@@ -2,22 +2,26 @@ package com.example.team5animalsheltertelegrambot.entity.shelter;
 
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Cat;
-import lombok.*;
-import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.*;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import java.util.List;
 
-
 @Entity
-@Getter
-@Setter
-@DiscriminatorValue("CSH")
-@Table(name = "cat_shelter")
+@DiscriminatorValue("KSH")
 public class CatShelter extends AnimalShelter {
 
-    @OneToMany
+    @OneToMany(mappedBy = "catShelter")
     private List<Cat> cats;
+
+    public List<Cat> getCats() {
+        return cats;
+    }
+
+    public void setCats(List<Cat> cats) {
+        this.cats = cats;
+    }
 }
 
 //    //пока оставил комменты, что бы не потерять информацию

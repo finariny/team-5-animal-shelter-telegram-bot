@@ -16,7 +16,7 @@ public interface BotCommandService {
      *
      * @param customer пользователь бота
      */
-    void runAbout(Customer customer);
+    void runAbout(@NotNull Customer customer);
 
     /**
      * Выводит информацию как взять животное из приюта     *

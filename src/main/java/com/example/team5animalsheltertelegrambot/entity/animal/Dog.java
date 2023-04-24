@@ -5,14 +5,13 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@NoArgsConstructor
 @Entity
-@DiscriminatorValue(value = "DOG")
-@Table(name = "dog")
-public class Dog extends Animal{
+@NoArgsConstructor
+@DiscriminatorValue("DOG")
+public class Dog extends Animal {
 
-    @ManyToOne
-    @JoinColumn(name = "dogs", referencedColumnName = "id")
+    @JoinColumn(name = "DOG_SHELTER_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
     private DogShelter dogShelter;
 
     public Dog(String name, Integer age, Boolean isHealthy, Boolean isVaccinated) {
@@ -20,5 +19,13 @@ public class Dog extends Animal{
         setAge(age);
         setHealthy(isHealthy);
         setVaccinated(isVaccinated);
+    }
+
+    public DogShelter getDogShelter() {
+        return dogShelter;
+    }
+
+    public void setDogShelter(DogShelter dogShelter) {
+        this.dogShelter = dogShelter;
     }
 }

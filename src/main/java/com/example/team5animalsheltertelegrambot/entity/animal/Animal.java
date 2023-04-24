@@ -1,24 +1,32 @@
 package com.example.team5animalsheltertelegrambot.entity.animal;
 
+import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "animal")
-@DiscriminatorValue(value = "ANIMAL")
+@DiscriminatorValue("ANIMAL")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
+@Table(name = "ANIMAL", indexes = {
+        @Index(name = "IDX_ANIMAL_CAT_SHELTER", columnList = "CAT_SHELTER_ID"),
+        @Index(name = "IDX_ANIMAL_DOG_SHELTER", columnList = "DOG_SHELTER_ID")
+})
 public class Animal extends NamedEntity {
 
-    @Column(name = "age")
+    @Column(name = "AGE")
     private Integer age;
 
-    @Column(name = "is_healthy")
+    @Column(name = "IS_HEALTHY")
     private Boolean isHealthy;
 
-    @Column(name = "is_vaccinated")
+    @Column(name = "IS_VACCINATED")
     private Boolean isVaccinated;
+
+    @OneToMany(mappedBy = "animal")
+    private List<AnimalReport> animalReports;
 
     public Integer getAge() {
         return age;
@@ -42,6 +50,14 @@ public class Animal extends NamedEntity {
 
     public void setVaccinated(Boolean vaccinated) {
         isVaccinated = vaccinated;
+    }
+
+    public List<AnimalReport> getAnimalReports() {
+        return animalReports;
+    }
+
+    public void setAnimalReports(List<AnimalReport> animalReports) {
+        this.animalReports = animalReports;
     }
 
     @Override
