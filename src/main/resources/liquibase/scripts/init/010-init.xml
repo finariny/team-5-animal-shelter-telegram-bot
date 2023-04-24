@@ -48,6 +48,7 @@ objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
             <column name="CONTACTS" type="VARCHAR(255)"/>
             <column name="SAFETY_ADVICE" type="VARCHAR(255)"/>
             <column name="DESCRIPTION" type="VARCHAR(255)"/>
+            <column name="IMAGE_NAME" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet id="4" author="team5animalsheltertelegrambot">

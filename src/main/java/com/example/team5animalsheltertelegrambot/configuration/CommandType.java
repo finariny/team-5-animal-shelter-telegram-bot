@@ -23,7 +23,7 @@ public enum CommandType {
     REPORT("/report", "Отчет о животном"),
     VOLUNTEER("/volunteer", "Позвать волонтера"),
     SHELTER("/shelter", "О приюте"),
-    LOCATION("/location","расписание работы приюта, адрес и схема проезда"),
+    LOCATION("/location","Расписание работы приюта, адрес и схема проезда"),
     CONTACT("/contact", "телефон для связи"),
     ADVICE("/advice","рекомендации для будущих хозяев");
 
