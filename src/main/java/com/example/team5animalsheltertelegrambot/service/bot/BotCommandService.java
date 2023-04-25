@@ -3,14 +3,13 @@ package com.example.team5animalsheltertelegrambot.service.bot;
 import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
-import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
-import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
 
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 /**
  * Сервис реализующий команды Телеграм бота
+ *
  * @see CommandType
  */
 public interface BotCommandService {
@@ -37,21 +36,21 @@ public interface BotCommandService {
     /**
      * Выводит клавиатуру с командами для работы с приютом для собак
      *
-     * @param chatId  идентификатор чата Телеграм
+     * @param chatId идентификатор чата Телеграм
      */
     void runDogs(Long chatId, Optional<AnimalShelter> shelter);
 
     /**
      * Стартует работу, предоставляет выбор приюта
      *
-     * @param chatId  идентификатор чата Телеграм
+     * @param chatId идентификатор чата Телеграм
      */
     void runStart(Long chatId);
 
     /**
      * Выводит информацию о приюте
      */
-    void runInfo(Long chatId,Optional<AnimalShelter>  shelter);
+    void runInfo(Long chatId, Optional<AnimalShelter> shelter);
 
     /**
      * Запускает интерфейс для отчета
@@ -60,13 +59,16 @@ public interface BotCommandService {
 
     /**
      * Вызывает волонтера
+     *
+     * @param chatId идентификатор чата Телеграм
      */
-    void runVolunteer();
+    void runVolunteer(Long chatId);
 
-    void runContact(Long chatId, Optional<AnimalShelter>  shelter);
-    void runAdvice(Long chatId, Optional<AnimalShelter>  shelter);
+    void runContact(Long chatId, Optional<AnimalShelter> shelter);
 
-    void runLocation(Long chatId, Optional<AnimalShelter>  shelter);
+    void runAdvice(Long chatId, Optional<AnimalShelter> shelter);
+
+    void runLocation(Long chatId, Optional<AnimalShelter> shelter);
 
     /**
      * Выводит текстовое сообщение с форматированием в Markdown (обрезок телеграмовский)

@@ -3,8 +3,10 @@ package com.example.team5animalsheltertelegrambot.service.bot.impl;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
+import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
 import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
+import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
@@ -37,6 +39,10 @@ public class BotCommandServiceImpl implements BotCommandService {
     private final Logger logger = LoggerFactory.getLogger(BotCommandServiceImpl.class);
 
     private final TelegramBot telegramBot;
+
+    private final TelegramProperties telegramProperties;
+
+    private final CustomerRepository customerRepository;
 
     @Autowired
     private CatShelterRepository catShelterRepository;
@@ -137,8 +143,25 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
-    public void runVolunteer() {
+    public void runVolunteer(Long chatId) {
 
+        Customer customer = customerRepository.findByChatId(chatId).get();
+
+        //Отправка сообщения в чат с волонтерами
+        String volunteerMessage = String.format("*%s* (@%s) зовёт волонтёра!", customer.getFirstName(), chatId);
+        String escapedVolunteerMessage = volunteerMessage
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+                .replace("!", "\\!");
+        SendMessage sendVolunteerMessage = new SendMessage(telegramProperties.volunteerChatId(), escapedVolunteerMessage);
+        prepareAndExecuteMessage(sendVolunteerMessage);
+
+        //Отправка сообщения в чат с ботом
+        String customerMessage = "Волонтёр скоро свяжется с Вами!";
+        String escapedCustomerMessage = customerMessage
+                .replace("!", "\\!");
+        SendMessage sendCustomerMessage = new SendMessage(chatId, escapedCustomerMessage);
+        prepareAndExecuteMessage(sendCustomerMessage);
     }
 
     @Override
