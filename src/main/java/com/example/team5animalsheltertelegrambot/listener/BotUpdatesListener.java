@@ -87,16 +87,16 @@ public class BotUpdatesListener implements UpdatesListener {
             switch (commandType) {
                 case CATS -> {
                     animalShelter = catShelterRepository.findById(2).orElse(null);
-                    botCommandService.runCats(chatId, Optional.ofNullable(animalShelter));
+                    botCommandService.runCats(chatId, animalShelter);
                 }
                 case DOGS -> {
                     animalShelter = dogShelterRepository.findById(1).orElse(null);
-                    botCommandService.runDogs(chatId, Optional.ofNullable(animalShelter));
+                    botCommandService.runDogs(chatId, animalShelter);
                 }
-                case INFO -> botCommandService.runInfo(chatId, Optional.ofNullable(animalShelter));
-                case CONTACT -> botCommandService.runContact(chatId, Optional.ofNullable(animalShelter));
-                case ADVICE -> botCommandService.runAdvice(chatId, Optional.ofNullable(animalShelter));
-                case LOCATION -> botCommandService.runLocation(chatId, Optional.ofNullable(animalShelter));
+                case INFO -> botCommandService.runInfo(chatId, animalShelter);
+                case CONTACT -> botCommandService.runContact(chatId, animalShelter);
+                case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
+                case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
             }
         } catch (Exception e) {
             logger.error("Ошибка обработки обратного вызова: {}", e.getMessage());
@@ -136,11 +136,11 @@ public class BotUpdatesListener implements UpdatesListener {
                     case ADOPT -> botCommandService.runAdopt();
                     case CATS -> {
                         animalShelter= catShelterRepository.findById(2).orElse(null);    
-                        botCommandService.runCats(chatId, Optional.ofNullable(animalShelter));
+                        botCommandService.runCats(chatId, animalShelter);
                     }
                     case DOGS -> {
                         animalShelter= dogShelterRepository.getReferenceById(1);
-                        botCommandService.runDogs(chatId, Optional.of(animalShelter));
+                        botCommandService.runDogs(chatId, animalShelter);
                     }
                     case START -> {
                         if (isNewCustomer) {
@@ -148,12 +148,12 @@ public class BotUpdatesListener implements UpdatesListener {
                         }
                         botCommandService.runStart(chatId);
                     }
-                    case INFO -> botCommandService.runInfo(chatId, Optional.ofNullable(animalShelter));
+                    case INFO -> botCommandService.runInfo(chatId, animalShelter);
                     case REPORT -> botCommandService.runReport();
                     case VOLUNTEER -> botCommandService.runVolunteer();
-                    case CONTACT -> botCommandService.runContact(chatId, Optional.ofNullable(animalShelter));
-                    case ADVICE -> botCommandService.runAdvice(chatId, Optional.ofNullable(animalShelter));
-                    case LOCATION -> botCommandService.runLocation(chatId, Optional.ofNullable(animalShelter));
+                    case CONTACT -> botCommandService.runContact(chatId, animalShelter);
+                    case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
+                    case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
 
                 }
             }
