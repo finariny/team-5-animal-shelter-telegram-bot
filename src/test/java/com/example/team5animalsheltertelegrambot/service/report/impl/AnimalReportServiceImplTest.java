@@ -17,11 +17,12 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 
+
 @ExtendWith(MockitoExtension.class)
 class AnimalReportServiceImplTest {
 
     @Mock
-    private AnimalReportRepository reportService;
+    private AnimalReportRepository animalReportRepositoryMock;
 
     @InjectMocks
     private AnimalReportServiceImpl service;
@@ -29,59 +30,52 @@ class AnimalReportServiceImplTest {
     @Test
     void uploadAnimalReportTest() {
         AnimalReport expected = new AnimalReport();
-        expected.setChatId(1L);
-        expected.setFileSize(2L);
+        expected.setPhoto("photo");
         expected.setDiet("diet");
         expected.setWellBeing("wellBeing");
         expected.setBehavior("behavior");
-        expected.setPhoto("filePath");
-        expected.setTimeDate(1L);
-        expected.setReportDay(1L);
 
-        Mockito.when(reportService.save(any(AnimalReport.class))).thenReturn(expected);
+        Mockito.when(animalReportRepositoryMock.save(any(AnimalReport.class))).thenReturn(expected);
         AnimalReport actual = service.save(expected);
 
-        Assertions.assertThat(actual.getChatId()).isEqualTo(expected.getChatId());
-        Assertions.assertThat(actual.getFileSize()).isEqualTo(expected.getFileSize());
         Assertions.assertThat(actual.getDiet()).isEqualTo(expected.getDiet());
         Assertions.assertThat(actual.getWellBeing()).isEqualTo(expected.getWellBeing());
         Assertions.assertThat(actual.getBehavior()).isEqualTo(expected.getBehavior());
         Assertions.assertThat(actual.getPhoto()).isEqualTo(expected.getPhoto());
-        Assertions.assertThat(actual.getReportDay()).isEqualTo(expected.getReportDay());
+
     }
 
     @Test
     void findByIdTest() {
         AnimalReport expected = new AnimalReport();
-        expected.setChatId(1L);
+        expected.setPhoto("photo");
         expected.setWellBeing("здоровье");
         expected.setBehavior("behaviorTest");
         expected.setDiet("dietTest");
-        expected.setReportDay(2L);
-        Mockito.when(reportService.findById(any(Integer.class))).thenReturn(Optional.of((expected)));
+        Mockito.when(animalReportRepositoryMock.findById(any(Integer.class))).thenReturn(Optional.of(expected));
 
         AnimalReport actual = service.findById(1);
 
-        Assertions.assertThat(actual.getChatId()).isEqualTo(expected.getChatId());
+        Assertions.assertThat(actual.getPhoto()).isEqualTo(expected.getPhoto());
         Assertions.assertThat(actual.getWellBeing()).isEqualTo(expected.getWellBeing());
         Assertions.assertThat(actual.getBehavior()).isEqualTo(expected.getBehavior());
         Assertions.assertThat(actual.getDiet()).isEqualTo(expected.getDiet());
-        Assertions.assertThat(actual.getReportDay()).isEqualTo(expected.getReportDay());
+
     }
 
     @Test
     void getAllTest() {
         List<AnimalReport> expected = new ArrayList<>();
         AnimalReport reportTest = new AnimalReport();
-        reportTest.setChatId(1L);
-        reportTest.setDiet("test");
-        reportTest.setReportDay(3L);
-        reportTest.setBehavior("test");
+
         reportTest.setPhoto("test");
+        reportTest.setWellBeing("wellBeing");
+        reportTest.setBehavior("test");
+        reportTest.setDiet("test");
         expected.add(reportTest);
 
-        Mockito.when(reportService.findAll()).thenReturn(expected);
-        Collection<AnimalReport> actual = reportService.findAll();
+        Mockito.when(animalReportRepositoryMock.findAll()).thenReturn(expected);
+        Collection<AnimalReport> actual = animalReportRepositoryMock.findAll();
 
         Assertions.assertThat(actual.size()).isEqualTo(expected.size());
         Assertions.assertThat(actual).isEqualTo(expected);
