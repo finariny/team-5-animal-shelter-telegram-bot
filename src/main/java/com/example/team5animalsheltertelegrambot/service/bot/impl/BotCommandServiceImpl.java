@@ -71,7 +71,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
-    public void runCats(Long chatId, Optional<AnimalShelter> shelter) {
+    public void runCats(Long chatId, AnimalShelter shelter) {
         //Отправка картинки
         sendPhotoShelter(chatId, shelter);
         //отображение кнопок
@@ -79,7 +79,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
-    public void runDogs(Long chatId, Optional<AnimalShelter> shelter) {
+    public void runDogs(Long chatId, AnimalShelter shelter) {
 
         //Отправка картинки
         sendPhotoShelter(chatId, shelter);
@@ -111,8 +111,8 @@ public class BotCommandServiceImpl implements BotCommandService {
 
 
     @Override
-    public void runInfo(Long chatId, Optional<AnimalShelter> shelter) {
-        String message = "<i>Кратко о приюте: </i>" + "<b>" + shelter.get().getDescription() + "</b><tg-emoji emoji-id=\"5368324170671202286\">\uD83D\uDC4D</tg-emoji>";
+    public void runInfo(Long chatId, AnimalShelter shelter) {
+        String message = "<i>Кратко о приюте: </i>" + "<b>" + shelter.getDescription() + "</b><tg-emoji emoji-id=\"5368324170671202286\">\uD83D\uDC4D</tg-emoji>";
         SendMessage sendMessage = new SendMessage(chatId, message);
         sendMessage.parseMode(ParseMode.HTML);
         telegramBot.execute(sendMessage);
@@ -207,23 +207,23 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
-    public void runContact(Long chatId, Optional<AnimalShelter> shelter) {
-        String message = "<i>Номер телефона приюта: </i><b>" + shelter.get().getContacts() + "</b>";
+    public void runContact(Long chatId, AnimalShelter shelter) {
+        String message = "<i>Номер телефона приюта: </i><b>" + shelter.getContacts() + "</b>";
         SendMessage sendMessage = new SendMessage(chatId, message);
         sendMessage.parseMode(ParseMode.HTML);
         telegramBot.execute(sendMessage);
     }
 
     @Override
-    public void runAdvice(Long chatId, Optional<AnimalShelter> shelter) {
+    public void runAdvice(Long chatId, AnimalShelter shelter) {
         try {
             byte[] pdf = Files.readAllBytes(Paths.get(
                     Objects.requireNonNull(BotUpdatesListener.class.getResource(
-                            "/" + shelter.get().getSafetyAdvice())).toURI()));
-            SendDocument sendDocument = new SendDocument(chatId, pdf).fileName(shelter.get().getSafetyAdvice());
+                            "/" + shelter.getSafetyAdvice())).toURI()));
+            SendDocument sendDocument = new SendDocument(chatId, pdf).fileName(shelter.getSafetyAdvice());
 
             sendDocument.caption(
-                    "Рекомендации для будущих хозяев от " + shelter.get().getName() + " приюта!"
+                    "Рекомендации для будущих хозяев от " + shelter.getName() + " приюта!"
             );
             telegramBot.execute(sendDocument);
         } catch (IOException | URISyntaxException e) {
@@ -232,14 +232,14 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
-    public void runLocation(Long chatId, Optional<AnimalShelter> shelter) {
+    public void runLocation(Long chatId, AnimalShelter shelter) {
         sendAddressAndWorkSchedule(chatId, shelter);
         try {
             byte[] photo = Files.readAllBytes(Paths.get(
-                    BotUpdatesListener.class.getResource("/" + shelter.get().getDrivingDirections()).toURI()));
+                    BotUpdatesListener.class.getResource("/" + shelter.getDrivingDirections()).toURI()));
             SendPhoto sendPhoto = new SendPhoto(chatId, photo);
             sendPhoto.caption(
-                    "Схема проезда к " + shelter.get().getName() + " приюту!"
+                    "Схема проезда к " + shelter.getName() + " приюту!"
             );
             telegramBot.execute(sendPhoto);
         } catch (IOException | URISyntaxException e) {
@@ -248,10 +248,10 @@ public class BotCommandServiceImpl implements BotCommandService {
 
     }
 
-    private void sendAddressAndWorkSchedule(Long chatId, Optional<AnimalShelter> shelter) {
+    private void sendAddressAndWorkSchedule(Long chatId, AnimalShelter shelter) {
         String first = "<b>Расписание работы приюта, адрес и схема проезда.</b>";
-        String second = "<i>Приют работает: <b><s>" + shelter.get().getWorkSchedule() + "</s></b></i>";
-        String third = "<i>Наш адрес: <b>" + shelter.get().getAddress() + "</b></i>";
+        String second = "<i>Приют работает: <b><s>" + shelter.getWorkSchedule() + "</s></b></i>";
+        String third = "<i>Наш адрес: <b>" + shelter.getAddress() + "</b></i>";
         SendMessage sendMessage = new SendMessage(chatId, first);
         sendMessage.parseMode(ParseMode.HTML);
         telegramBot.execute(sendMessage);
@@ -309,13 +309,13 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     //Вспомогательный метод для отправки картинки при выборе приюта:
-    private void sendPhotoShelter(Long chatId, Optional<AnimalShelter> shelter) {
+    private void sendPhotoShelter(Long chatId, AnimalShelter shelter) {
         try {
             byte[] photo = Files.readAllBytes(Paths.get(
-                    BotUpdatesListener.class.getResource("/" + shelter.get().getImageName()/*"/catShelter.jpg"*/).toURI()));
+                    BotUpdatesListener.class.getResource("/" + shelter.getImageName()).toURI()));
             SendPhoto sendPhoto = new SendPhoto(chatId, photo);
             sendPhoto.caption(
-                    "Приветствуем Вас в " + shelter.get().getName() + " приюте!"
+                    "Приветствуем Вас в " + shelter.getName() + " приюте!"
             );
             telegramBot.execute(sendPhoto);
         } catch (IOException | URISyntaxException e) {

@@ -31,14 +31,14 @@ public interface BotCommandService {
      *
      * @param chatId идентификатор чата Телеграм
      */
-    void runCats(Long chatId, Optional<AnimalShelter> shelter);
+    void runCats(Long chatId, AnimalShelter shelter);
 
     /**
      * Выводит клавиатуру с командами для работы с приютом для собак
      *
      * @param chatId идентификатор чата Телеграм
      */
-    void runDogs(Long chatId, Optional<AnimalShelter> shelter);
+    void runDogs(Long chatId, AnimalShelter shelter);
 
     /**
      * Стартует работу, предоставляет выбор приюта
@@ -50,7 +50,7 @@ public interface BotCommandService {
     /**
      * Выводит информацию о приюте
      */
-    void runInfo(Long chatId, Optional<AnimalShelter> shelter);
+    void runInfo(Long chatId,AnimalShelter  shelter);
 
     /**
      * Запускает интерфейс для отчета
@@ -64,11 +64,10 @@ public interface BotCommandService {
      */
     void runVolunteer(Long chatId);
 
-    void runContact(Long chatId, Optional<AnimalShelter> shelter);
+    void runContact(Long chatId, AnimalShelter  shelter);
+    void runAdvice(Long chatId, AnimalShelter  shelter);
 
-    void runAdvice(Long chatId, Optional<AnimalShelter> shelter);
-
-    void runLocation(Long chatId, Optional<AnimalShelter> shelter);
+    void runLocation(Long chatId, AnimalShelter shelter);
 
     /**
      * Выводит текстовое сообщение с форматированием в Markdown (обрезок телеграмовский)
