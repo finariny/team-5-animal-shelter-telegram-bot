@@ -132,7 +132,7 @@ public class BotUpdatesListener implements UpdatesListener {
                     case ABOUT -> botCommandService.runAbout(customer);
                     case ADOPT -> botCommandService.runAdopt();
                     case CATS -> {
-                        animalShelter= catShelterRepository.findById(2).orElse(null);    
+                        animalShelter= catShelterRepository.findById(2).orElse(null);
                         botCommandService.runCats(chatId, animalShelter);
                     }
                     case DOGS -> {
