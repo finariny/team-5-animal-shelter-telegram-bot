@@ -127,8 +127,8 @@ public class CatService {
      * @return {@code true} - сущность сохранена, {@code false} - сущность не сохранена
      */
     public Boolean deleteById(Integer id) {
-        Optional<Cat> findTById = findById(id);
-        if (id == null || findTById.isEmpty()) {
+        Optional<Cat> findCatById = findById(id);
+        if (id == null || findCatById.isEmpty()) {
             return false;
         }
         catRepository.deleteById(id);

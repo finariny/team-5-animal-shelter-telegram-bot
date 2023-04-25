@@ -10,5 +10,6 @@ import org.springframework.boot.context.properties.ConstructorBinding;
  */
 @ConstructorBinding
 @ConfigurationProperties(prefix = "telegram")
-public record TelegramProperties(String token) {
+public record TelegramProperties(String token,
+                                 String volunteerChatId) {
 }

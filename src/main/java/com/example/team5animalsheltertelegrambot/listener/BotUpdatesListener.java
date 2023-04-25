@@ -3,10 +3,8 @@ package com.example.team5animalsheltertelegrambot.listener;
 import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
-import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
-import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
 import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
-import com.example.team5animalsheltertelegrambot.repository.CustomerRepository;
+import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.pengrad.telegrambot.TelegramBot;
@@ -17,7 +15,6 @@ import com.pengrad.telegrambot.model.Update;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -118,7 +115,7 @@ public class BotUpdatesListener implements UpdatesListener {
             Customer customer;
 
             if (customerRepository.existsByChatId(chatId)) {
-                customer = customerRepository.findByChatId(chatId);
+                customer = customerRepository.findByChatId(chatId).orElseThrow();
             } else {
                 isNewCustomer = true;
                 customer = customerRepository.save(
@@ -150,7 +147,7 @@ public class BotUpdatesListener implements UpdatesListener {
                     }
                     case INFO -> botCommandService.runInfo(chatId, animalShelter);
                     case REPORT -> botCommandService.runReport();
-                    case VOLUNTEER -> botCommandService.runVolunteer();
+                    case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                     case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                     case LOCATION -> botCommandService.runLocation(chatId, animalShelter);

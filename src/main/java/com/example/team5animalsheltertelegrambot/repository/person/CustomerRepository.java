@@ -1,7 +1,9 @@
-package com.example.team5animalsheltertelegrambot.repository;
+package com.example.team5animalsheltertelegrambot.repository.person;
 
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 
 /**
  * Репозиторий для работы с пользователями бота (посетители приюта)
@@ -20,7 +22,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
      * Извлекает объект по идентификатору chatId.
      *
      * @param chatId идентификатор чата Телеграм.
-     * @return сущность {@link Customer}
+     * @return Объект-контейнер сущности {@link Customer}
      */
-    Customer findByChatId(Long chatId);
+    Optional<Customer> findByChatId(Long chatId);
 }

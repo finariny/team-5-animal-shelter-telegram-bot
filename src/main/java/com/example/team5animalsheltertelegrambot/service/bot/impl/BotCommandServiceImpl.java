@@ -3,22 +3,30 @@ package com.example.team5animalsheltertelegrambot.service.bot.impl;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
+import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
 import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
+import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendDocument;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
+import liquibase.pro.packaged.S;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 
@@ -28,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.example.team5animalsheltertelegrambot.configuration.CommandType.*;
 
@@ -37,6 +46,10 @@ public class BotCommandServiceImpl implements BotCommandService {
     private final Logger logger = LoggerFactory.getLogger(BotCommandServiceImpl.class);
 
     private final TelegramBot telegramBot;
+
+    private final TelegramProperties telegramProperties;
+
+    private final CustomerRepository customerRepository;
 
     @Autowired
     private CatShelterRepository catShelterRepository;
@@ -136,9 +149,61 @@ public class BotCommandServiceImpl implements BotCommandService {
 
     }
 
-    @Override
-    public void runVolunteer() {
+    /**
+     * Загрузка фото
+     */
+    public void getPhoto (Message message){
+        PhotoSize photoSize = message.photo()[message.photo().length - 1];
+        GetFileResponse getFileResponse = telegramBot.execute(new GetFile(photoSize.fileId()));
+        if (getFileResponse.isOk()) {
+            try {
+                String extension = StringUtils.getFilenameExtension(
+                        getFileResponse.file().filePath());
+                byte[] photo = telegramBot.getFileContent(getFileResponse.file());
+                Files.write(Paths.get(UUID.randomUUID() + "." + extension), photo);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
+    /**
+     * Метод для получения текста!
+     */
+    public void getMassage(Message message) {
+        String text = message.text();
+        GetFileResponse getFileResponse = telegramBot.execute(new GetFile(text));
+        if (getFileResponse.isOk()) {
+            String extension = StringUtils.getFilenameExtension(getFileResponse.file().filePath());
+            try {
+                String txt = telegramBot.getFullFilePath(getFileResponse.file());
+                Files.write(Paths.get(UUID.randomUUID() + "." + extension), txt.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public void runVolunteer(Long chatId) {
+
+        Customer customer = customerRepository.findByChatId(chatId).get();
+
+        //Отправка сообщения в чат с волонтерами
+        String volunteerMessage = String.format("*%s* (@%s) зовёт волонтёра!", customer.getFirstName(), chatId);
+        String escapedVolunteerMessage = volunteerMessage
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+                .replace("!", "\\!");
+        SendMessage sendVolunteerMessage = new SendMessage(telegramProperties.volunteerChatId(), escapedVolunteerMessage);
+        prepareAndExecuteMessage(sendVolunteerMessage);
+
+        //Отправка сообщения в чат с ботом
+        String customerMessage = "Волонтёр скоро свяжется с Вами!";
+        String escapedCustomerMessage = customerMessage
+                .replace("!", "\\!");
+        SendMessage sendCustomerMessage = new SendMessage(chatId, escapedCustomerMessage);
+        prepareAndExecuteMessage(sendCustomerMessage);
     }
 
     @Override

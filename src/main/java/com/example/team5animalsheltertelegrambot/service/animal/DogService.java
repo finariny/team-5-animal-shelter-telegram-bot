@@ -127,8 +127,8 @@ public class DogService {
      * @return {@code true} - сущность сохранена, {@code false} - сущность не сохранена
      */
     public Boolean deleteById(Integer id) {
-        Optional<Dog> findTById = findById(id);
-        if (id == null || findTById.isEmpty()) {
+        Optional<Dog> findDogById = findById(id);
+        if (id == null || findDogById.isEmpty()) {
             return false;
         }
         dogRepository.deleteById(id);
