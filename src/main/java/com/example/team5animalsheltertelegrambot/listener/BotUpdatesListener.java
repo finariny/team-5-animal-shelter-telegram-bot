@@ -91,6 +91,8 @@ public class BotUpdatesListener implements UpdatesListener {
                     botCommandService.runDogs(chatId, Optional.ofNullable(animalShelter));
                 }
                 case INFO -> botCommandService.runInfo(chatId, Optional.ofNullable(animalShelter));
+                case REPORT -> botCommandService.runReport();
+                case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                 case CONTACT -> botCommandService.runContact(chatId, Optional.ofNullable(animalShelter));
                 case ADVICE -> botCommandService.runAdvice(chatId, Optional.ofNullable(animalShelter));
                 case LOCATION -> botCommandService.runLocation(chatId, Optional.ofNullable(animalShelter));
@@ -147,7 +149,7 @@ public class BotUpdatesListener implements UpdatesListener {
                     }
                     case INFO -> botCommandService.runInfo(chatId, Optional.ofNullable(animalShelter));
                     case REPORT -> botCommandService.runReport();
-                    case VOLUNTEER -> botCommandService.runVolunteer();
+                    case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, Optional.ofNullable(animalShelter));
                     case ADVICE -> botCommandService.runAdvice(chatId, Optional.ofNullable(animalShelter));
                     case LOCATION -> botCommandService.runLocation(chatId, Optional.ofNullable(animalShelter));
