@@ -1,8 +1,6 @@
 package com.example.team5animalsheltertelegrambot.controller;
 
 
-import com.example.team5animalsheltertelegrambot.entity.person.Customer;
-import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
 import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
@@ -14,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * API контроллер для редактирования базовой информации о приюте собак
@@ -55,9 +50,9 @@ public class DogShelterController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Приют собак добавлен",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = Customer.class)))),})
-    @PostMapping
-    public ResponseEntity<DogShelter> save(@RequestBody DogShelter dogShelter) {
+                            array = @ArraySchema(schema = @Schema(implementation = DogShelter.class)))),})
+    @PostMapping("/")
+    public ResponseEntity<DogShelter> create(@RequestBody DogShelter dogShelter) {
         try {
             return ResponseEntity.ok(dogShelterRepository.save(dogShelter));
         } catch (Exception e) {
