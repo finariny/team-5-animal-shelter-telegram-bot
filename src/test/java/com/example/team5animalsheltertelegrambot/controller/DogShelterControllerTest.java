@@ -59,6 +59,7 @@ class DogShelterControllerTest {
     @Test
     void create() throws Exception {
         when(dogShelterRepository.save(any(DogShelter.class))).thenReturn(dogShelterDefault);
+
         this.mockMvc.perform(post("/dogShelter/")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(dogShelterDefault)))
