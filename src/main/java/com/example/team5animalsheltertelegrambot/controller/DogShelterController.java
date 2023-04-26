@@ -1,9 +1,10 @@
 package com.example.team5animalsheltertelegrambot.controller;
 
 
+
+import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
 import com.example.team5animalsheltertelegrambot.entity.shelter.DogShelter;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
-import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,14 +13,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.PostConstruct;
-import java.io.IOException;
+import java.util.List;
+
 
 /**
  * API контроллер для редактирования базовой информации о приюте собак
@@ -35,8 +36,6 @@ import java.io.IOException;
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка программы")
 })
 public class DogShelterController {
-
-    private final ShelterService<DogShelter> shelterService;
 
     private final DogShelterRepository dogShelterRepository;
     DogShelter dogShelter;
@@ -60,128 +59,23 @@ public class DogShelterController {
         }
     }
 
-    @PostMapping("/name")
+    @GetMapping("/{id}")
     @Operation(
-            summary = "Контроллер по назначению названия приюта"
+            summary = "Получение всей информации о приюте"
     )
-    public void setName(@RequestParam String name){
-        dogShelter.setName(name);
+    public ResponseEntity<DogShelter> findById(@PathVariable Integer id) {
+        return ResponseEntity.of(dogShelterRepository.findById(id));
     }
 
-    @GetMapping("/name")
-    @Operation(
-            summary = "Контроллер по получению названия приюта"
-    )
-    public ResponseEntity<String> getName(){
-        return ResponseEntity.ok(dogShelter.getName());
+    @GetMapping("/all")
+    public ResponseEntity<List<DogShelter>> getAll() {
+        return ResponseEntity.ok(dogShelterRepository.findAll());
     }
 
-    @PutMapping("/name")
-    @Operation(
-            summary = "Контроллер по редактированию названия приюта"
-    )
-    public ResponseEntity<String> updateName(@RequestParam String name){
-
-        return ResponseEntity.ok(shelterService.updateName(dogShelter, name));
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable @NotNull Integer id) {
+        dogShelterRepository.deleteById(id);
     }
-    @PostMapping("/address")
-    @Operation(
-            summary = "Контроллер по назначению адреса приюта"
-    )
-    public void setAddress(@RequestParam String str){
-        dogShelter.setAddress(str);
-    }
-
-    @GetMapping("/address")
-    @Operation(
-            summary = "Контроллер по получению адреса приюта"
-    )
-    public ResponseEntity<String> getAddress(){
-        return ResponseEntity.ok(dogShelter.getAddress());
-    }
-
-
-    @PutMapping("/address")
-    @Operation(
-            summary = "Контроллер по редактированию адреса приюта "
-    )
-    public ResponseEntity<String> updateAddress(@RequestParam String address){
-        return ResponseEntity.ok(shelterService.updateAddress(dogShelter, address));
-    }
-
-    @PostMapping("/contact")
-    @Operation(
-            summary = "Контроллер по назначению телефона приюта"
-    )
-    public void setContact(@RequestParam String str){
-        dogShelter.setContacts(str);
-    }
-
-    @GetMapping("/contact")
-    @Operation(
-            summary = "Контроллер по получению телефона приюта"
-    )
-    public ResponseEntity<String> getContact(){
-        return ResponseEntity.ok(dogShelter.getContacts());
-    }
-    @PutMapping("/contact")
-    @Operation(
-            summary = "Контроллер по редактированию контактных данных приюта "
-    )
-    public ResponseEntity<String> updateContact(@RequestParam String contact){
-        return ResponseEntity.ok(shelterService.updateContact(dogShelter, contact));
-    }
-
-    @PostMapping("/description")
-    @Operation(
-            summary = "Контроллер по назначению описания приюта"
-    )
-    public void setDescription(@RequestParam String str){
-        dogShelter.setDescription(str);
-    }
-
-    @GetMapping("/description")
-    @Operation(
-            summary = "Контроллер по получению описания приюта"
-    )
-    public ResponseEntity<String> getDescription(){
-        return ResponseEntity.ok(dogShelter.getDescription());
-    }
-    @PutMapping("/description")
-    @Operation(
-            summary = "Контроллер по редактированию контактных данных приюта "
-    )
-    public ResponseEntity<String> updateDescription(@RequestParam String description){
-        return ResponseEntity.ok(shelterService.updateDescription(dogShelter, description));
-    }
-    @PostMapping(value = "/importDogSchema", consumes = (MediaType.IMAGE_PNG_VALUE) )
-    @Operation(
-            summary = "загрузка и замена файла .png cо схемой проезда к приюту собак"
-    )
-    public ResponseEntity<Void> uploadDogSchemaFile(@RequestParam MultipartFile file) {
-        try {
-            shelterService.importSchemaDataFile(dogShelter,file);
-            return ResponseEntity.ok().build();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
-
-
-    @PostMapping(value = "/importDogAdvice", consumes = (MediaType.APPLICATION_PDF_VALUE) )
-    @Operation(
-            summary = "загрузка и замена файла PDF рекомендаций для будущих хозяев животных"
-    )
-    public ResponseEntity<Void> uploadDogAdviceFile(@RequestParam MultipartFile file) {
-        try {
-            shelterService.importAdviceDataFile(dogShelter,file);
-            return ResponseEntity.ok().build();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
-
 
 }
