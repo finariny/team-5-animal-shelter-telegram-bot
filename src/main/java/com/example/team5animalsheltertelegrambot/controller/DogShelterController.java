@@ -13,12 +13,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,7 @@ import java.util.Optional;
  * API контроллер для редактирования базовой информации о приюте собак
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/dogShelter")
 @Tag(name="Приют собак", description = "Редактирование информация о приюте для собак")
 @ApiResponses(value = {
@@ -36,12 +40,15 @@ import java.util.Optional;
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка программы")
 })
 public class DogShelterController {
-    private final ShelterService shelterService;
+
+    private final ShelterService<DogShelter> shelterService;
+
     private final DogShelterRepository dogShelterRepository;
-    DogShelter dogShelter; // после внесение в базу Эту сроку поменять на:   DogShelter dogShelter = dogShelterRepository.getReferenceById(0);
-    public DogShelterController(ShelterService shelterService, DogShelterRepository dogShelterRepository) {
-        this.shelterService = shelterService;
-        this.dogShelterRepository = dogShelterRepository;
+    DogShelter dogShelter;
+
+    @PostConstruct
+    public void findShelter() {
+        dogShelter = dogShelterRepository.findById(1).orElse(null); // приют собак под индексом 1
     }
 
     @Operation(summary = "Добавление приюта собак")
@@ -135,7 +142,7 @@ public class DogShelterController {
             summary = "Контроллер по назначению описания приюта"
     )
     public void setDescription(@RequestParam String str){
-        dogShelter.setContacts(str);
+        dogShelter.setDescription(str);
     }
 
     @GetMapping("/description")
@@ -143,14 +150,14 @@ public class DogShelterController {
             summary = "Контроллер по получению описания приюта"
     )
     public ResponseEntity<String> getDescription(){
-        return ResponseEntity.ok(dogShelter.getContacts());
+        return ResponseEntity.ok(dogShelter.getDescription());
     }
     @PutMapping("/description")
     @Operation(
             summary = "Контроллер по редактированию контактных данных приюта "
     )
     public ResponseEntity<String> updateDescription(@RequestParam String description){
-        return ResponseEntity.ok(shelterService.updateContact(dogShelter, description));
+        return ResponseEntity.ok(shelterService.updateDescription(dogShelter, description));
     }
     @PostMapping(value = "/importDogSchema", consumes = (MediaType.IMAGE_PNG_VALUE) )
     @Operation(

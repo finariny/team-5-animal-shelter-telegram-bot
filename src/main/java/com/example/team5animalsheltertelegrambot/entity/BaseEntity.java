@@ -23,4 +23,12 @@ public class BaseEntity {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

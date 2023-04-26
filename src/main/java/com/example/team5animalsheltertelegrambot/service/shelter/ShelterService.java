@@ -20,7 +20,7 @@ import java.util.Optional;
  *           работу данных методов.
  */
 
-public interface ShelterService <T extends AnimalShelter,R extends JpaRepository> {
+public interface ShelterService <T extends AnimalShelter> {
 
 
 

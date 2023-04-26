@@ -5,6 +5,8 @@ import com.example.team5animalsheltertelegrambot.entity.shelter.CatShelter;
 import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.service.shelter.ShelterService;
 
+import com.example.team5animalsheltertelegrambot.service.shelter.impl.ShelterServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,17 +20,16 @@ import static com.example.team5animalsheltertelegrambot.constant.ShelterConstant
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@ExtendWith(MockitoExtension.class)
+
 public class ShelterServiceTest {
 
     private final List<Cat> cats = new ArrayList<>();
     private final List<CatShelter> shelters = new ArrayList<>();
-    private CatShelter catShelter;
+    private CatShelter catShelter=new CatShelter();;
 
 
-    @InjectMocks
-    private ShelterService out;
 
+    private final ShelterServiceImpl out = new ShelterServiceImpl();
 
 
     @Test

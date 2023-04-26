@@ -51,10 +51,6 @@ public class BotCommandServiceImpl implements BotCommandService {
 
     private final CustomerRepository customerRepository;
 
-    @Autowired
-    private CatShelterRepository catShelterRepository;
-    @Autowired
-    private DogShelterRepository dogShelterRepository;
 
     @Override
     public void runAbout(@NotNull Customer customer) {
