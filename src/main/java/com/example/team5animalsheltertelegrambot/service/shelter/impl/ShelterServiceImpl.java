@@ -25,13 +25,6 @@ public class ShelterServiceImpl implements ShelterService {
 
 
 
-//
-//    public String findAny(){
-//        Optional<CatShelter> catShelter = catShelterRepository.findById(1);
-//        if (catShelter.isPresent()) {
-//            return catShelter.get().getName();
-//        } else return "I have nothing to say.\n";
-//    }
 
     @Override
     public String updateName(AnimalShelter t, String name) {
