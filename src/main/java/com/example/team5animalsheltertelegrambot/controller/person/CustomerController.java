@@ -73,7 +73,7 @@ public class CustomerController {
                             schema = @Schema(implementation = Customer.class))),
             @ApiResponse(responseCode = "404", description = "Посетитель не найден")})
     @GetMapping("/chatId/{chatId}")
-    public ResponseEntity<Customer> findById(@PathVariable @Positive Long chatId) {
+    public ResponseEntity<Customer> findByChatId(@PathVariable @Positive Long chatId) {
         return ResponseEntity.of(customerRepository.findByChatId(chatId));
     }
 
@@ -87,7 +87,7 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<Customer> save(@RequestBody @Valid Customer customer) {
         try {
-            return ResponseEntity.ok(customerRepository.save(customer));
+            return ResponseEntity.status(HttpStatus.CREATED).body(customerRepository.save(customer));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -101,7 +101,7 @@ public class CustomerController {
             @ApiResponse(responseCode = "400",
                     description = "Параметры запроса отсутствуют или имеют некорректный формат")})
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateByChatId(
+    public ResponseEntity<Customer> updateById(
             @PathVariable Integer id,
             @RequestParam(name = "chatId", required = false) @Positive Long chatId,
             @RequestParam(name = "firstName", required = false) String firstName,
