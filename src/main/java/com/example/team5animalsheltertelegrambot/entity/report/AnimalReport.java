@@ -37,6 +37,26 @@ public class AnimalReport extends NamedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Customer customer;
 
+    public AnimalReport(String photo,
+                        String diet,
+                        String wellBeing,
+                        String behavior,
+                        LocalDateTime dateCreate,
+                        Animal animal,
+                        Customer customer) {
+        this.photo = photo;
+        this.diet = diet;
+        this.wellBeing = wellBeing;
+        this.behavior = behavior;
+        this.dateCreate = dateCreate;
+        this.animal = animal;
+        this.customer = customer;
+    }
+
+    public AnimalReport() {
+
+    }
+
     public String getPhoto() {
         return photo;
     }
@@ -92,4 +112,5 @@ public class AnimalReport extends NamedEntity {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
 }

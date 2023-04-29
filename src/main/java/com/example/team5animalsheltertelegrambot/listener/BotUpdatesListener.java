@@ -146,7 +146,7 @@ public class BotUpdatesListener implements UpdatesListener {
                         botCommandService.runStart(chatId);
                     }
                     case INFO -> botCommandService.runInfo(chatId, animalShelter);
-                    case REPORT -> botCommandService.runReport();
+                    case REPORT -> botCommandService.runReport(new Update());
                     case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                     case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
