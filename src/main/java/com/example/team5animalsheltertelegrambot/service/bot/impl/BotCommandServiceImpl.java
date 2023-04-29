@@ -1,16 +1,24 @@
 package com.example.team5animalsheltertelegrambot.service.bot.impl;
 
+import ch.qos.logback.core.joran.conditional.IfAction;
+import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.exception.ReportException;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
 import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
+import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
 import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
 import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
+import com.example.team5animalsheltertelegrambot.service.report.impl.AnimalReportServiceImpl;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.PhotoSize;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -33,10 +41,16 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.example.team5animalsheltertelegrambot.configuration.CommandType.*;
 
@@ -50,6 +64,13 @@ public class BotCommandServiceImpl implements BotCommandService {
     private final TelegramProperties telegramProperties;
 
     private final CustomerRepository customerRepository;
+    private final AnimalReportServiceImpl animalReportService;
+    private final AnimalReportRepository animalReportRepository;
+
+    private static final String MESSAGE = """
+            (Рацион:)(\\s)(\\W+)(;)
+            (Здоровье:)(\\s)(\\W+)(;)
+            (Поведение:)(\\s)(\\W+)(;)""";
 
 
     @Override
@@ -139,46 +160,94 @@ public class BotCommandServiceImpl implements BotCommandService {
         prepareAndExecuteMessage(sendMessage1);
 
     }
-
+    /**
+     * Загрузка отчета
+     */
     @Override
-    public void runReport() {
+    public void runReport(Long chatId, Update update) {
+        String infoReport = """
+                Для отчета нужна следующая информация:
+                - Фото животного. \s
+                - Рацион животного.
+                - Общее самочувствие и привыкание к новому месту.
+                - Изменение в поведении: отказ от старых привычек, приобретение новых.""";
+        SendMessage sendMessage = new SendMessage(chatId, infoReport);
+        sendMessage.parseMode(ParseMode.HTML);
+        telegramBot.execute(sendMessage);
+        Pattern pattern = Pattern.compile(MESSAGE);
+        Matcher matcher = pattern.matcher(update.message().caption());
+        if (matcher.matches()) {
+            String diet = matcher.group(3);
+            String wellBeing = matcher.group(7);
+            String behavior = matcher.group(11);
+            Customer customer = new Customer();
+            Animal animal = new Animal();
 
-    }
-
-    /**
-     * Загрузка фото
-     */
-    public void getPhoto (Message message){
-        PhotoSize photoSize = message.photo()[message.photo().length - 1];
-        GetFileResponse getFileResponse = telegramBot.execute(new GetFile(photoSize.fileId()));
-        if (getFileResponse.isOk()) {
-            try {
-                String extension = StringUtils.getFilenameExtension(
-                        getFileResponse.file().filePath());
-                byte[] photo = telegramBot.getFileContent(getFileResponse.file());
-                Files.write(Paths.get(UUID.randomUUID() + "." + extension), photo);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        GetFile getFileRequest = new GetFile(update.message().photo()[1].fileId());
+        GetFileResponse getFileResponse = telegramBot.execute(getFileRequest);
+            if (getFileResponse.isOk()) {
+                File file = getFileResponse.file();
+                file.fileSize();
+                String pathPhoto = file.filePath();
+                LocalDateTime dateTime = LocalDateTime.now();
+                animalReportService.uploadAnimalReport(
+                        pathPhoto
+                        , diet
+                        , wellBeing
+                        , behavior
+                        , dateTime
+                        , animal
+                        , customer);
+                telegramBot.execute(new SendMessage(update.message().chat().id(), "Отчет принят!"));
+                System.out.println("Отчет успешно принят от: " + update.message().chat().id());
+            } else {
+                throw new ReportException();
             }
         }
     }
 
-    /**
-     * Метод для получения текста!
-     */
-    public void getMassage(Message message) {
-        String text = message.text();
-        GetFileResponse getFileResponse = telegramBot.execute(new GetFile(text));
-        if (getFileResponse.isOk()) {
-            String extension = StringUtils.getFilenameExtension(getFileResponse.file().filePath());
-            try {
-                String txt = telegramBot.getFullFilePath(getFileResponse.file());
-                Files.write(Paths.get(UUID.randomUUID() + "." + extension), txt.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+
+    private final String CONGRATULATION = "Поздравляем!Вы прошли испытательный срок!";
+    private final String WARNING = "Дорогой усыновитель, мы заметили, " +
+            "что ты заполняешь отчет не так подробно," +
+            " как необходимо. Пожалуйста, подойди ответственнее " +
+            "к этому занятию. В противном случае волонтеры " +
+            "приюта будут обязаны самолично проверять " +
+            "условия содержания животного.";
+    private final String ADDITION = "В отчете нет/нехватает информации, дополните описание! ";
+    private final String REMINDER = "Вы уже отправляли отчет сегодня";
+
+
+    public void checkingTheCorrectnessOfTheSentReport(Long chatId, Update update) {
+        long chat = update.message().chat().id();
+        long accountDaysInMonth = LocalDate.now().lengthOfMonth();
+        long reportDay = animalReportRepository
+                .findAll()
+                .stream()
+                .filter(s -> s.getCustomer().getChatId() == chat)
+                .count() + 1;
+        if (update.message() != null
+                && update.message().photo() != null
+                && update.message().caption() != null) {
+            runReport(chatId, update);
+        } else if
+            (update.message() != null
+                    && update.message().photo() != null
+                    && update.message().caption() != null) {
+                sendMessage(chat, REMINDER);
             }
-        }
+
+        if (reportDay == accountDaysInMonth) {
+            if (update.message() != null && update.message().photo() != null && update.message().caption() != null) {
+                sendMessage(chat, CONGRATULATION);
+            }
+        } else if (update.message() != null && update.message().photo() != null && update.message().caption() == null) {
+            sendMessage(chat, ADDITION);
+        }else if (update.message() == null && update.message().photo() != null && update.message().caption() == null) {
+            sendMessage(chat, WARNING);
+        }runReport(chatId ,update);
     }
+
 
     @Override
     public void runVolunteer(Long chatId) {
