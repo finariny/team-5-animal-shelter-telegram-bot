@@ -57,7 +57,7 @@ public interface BotCommandService {
     /**
      * Запускает интерфейс для отчета
      */
-    void runReport(Update update);
+    void runReport(Long chatId, Update update);
 
     /**
      * Вызывает волонтера

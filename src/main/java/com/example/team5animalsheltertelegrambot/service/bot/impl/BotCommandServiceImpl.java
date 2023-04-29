@@ -43,6 +43,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
@@ -163,14 +164,16 @@ public class BotCommandServiceImpl implements BotCommandService {
      * Загрузка отчета
      */
     @Override
-    public void runReport(Update update) {
+    public void runReport(Long chatId, Update update) {
         String infoReport = """
                 Для отчета нужна следующая информация:
                 - Фото животного. \s
                 - Рацион животного.
                 - Общее самочувствие и привыкание к новому месту.
                 - Изменение в поведении: отказ от старых привычек, приобретение новых.""";
-        System.out.println(infoReport);
+        SendMessage sendMessage = new SendMessage(chatId, infoReport);
+        sendMessage.parseMode(ParseMode.HTML);
+        telegramBot.execute(sendMessage);
         Pattern pattern = Pattern.compile(MESSAGE);
         Matcher matcher = pattern.matcher(update.message().caption());
         if (matcher.matches()) {
@@ -215,37 +218,34 @@ public class BotCommandServiceImpl implements BotCommandService {
     private final String REMINDER = "Вы уже отправляли отчет сегодня";
 
 
-    public void checkingTheCorrectnessOfTheSentReport(Update update) {
-        long chatId = update.message().chat().id();
+    public void checkingTheCorrectnessOfTheSentReport(Long chatId, Update update) {
+        long chat = update.message().chat().id();
+        long accountDaysInMonth = LocalDate.now().lengthOfMonth();
         long reportDay = animalReportRepository
                 .findAll()
                 .stream()
-                .filter(s -> s.getCustomer().getChatId() == chatId)
+                .filter(s -> s.getCustomer().getChatId() == chat)
                 .count() + 1;
         if (update.message() != null
                 && update.message().photo() != null
                 && update.message().caption() != null) {
-            runReport(update);
-        } else {
-            if (update.message() != null
+            runReport(chatId, update);
+        } else if
+            (update.message() != null
                     && update.message().photo() != null
                     && update.message().caption() != null) {
-                sendMessage(chatId, REMINDER);
+                sendMessage(chat, REMINDER);
             }
-        }
-        if (reportDay == 31) {
+
+        if (reportDay == accountDaysInMonth) {
             if (update.message() != null && update.message().photo() != null && update.message().caption() != null) {
-                runReport(update);
+                sendMessage(chat, CONGRATULATION);
             }
-        } else {
-            sendMessage(chatId, CONGRATULATION);
-        }
-        if (update.message() != null && update.message().photo() != null && update.message().caption() == null) {
-            sendMessage(chatId, ADDITION);
-        }
-        if (update.message() == null && update.message().photo() != null && update.message().caption() == null) {
-            sendMessage(chatId, WARNING);
-        }
+        } else if (update.message() != null && update.message().photo() != null && update.message().caption() == null) {
+            sendMessage(chat, ADDITION);
+        }else if (update.message() == null && update.message().photo() != null && update.message().caption() == null) {
+            sendMessage(chat, WARNING);
+        }runReport(chatId ,update);
     }
 
 
