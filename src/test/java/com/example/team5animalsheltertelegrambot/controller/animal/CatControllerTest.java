@@ -1,6 +1,5 @@
 package com.example.team5animalsheltertelegrambot.controller.animal;
 
-import com.example.team5animalsheltertelegrambot.repository.animal.CatRepository;
 import com.example.team5animalsheltertelegrambot.service.animal.CatService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -31,9 +30,6 @@ class CatControllerTest {
 
     @MockBean
     private CatService catService;
-
-    @MockBean
-    private CatRepository catRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -93,37 +89,30 @@ class CatControllerTest {
 
     @Test
     void findAllByHealthAndVaccination_ShouldReturn_ListOfHealthyCats() throws Exception {
-        when(catRepository.findAllByHealth(true))
-                .thenReturn(LIST_OF_HEALTHY_CATS);
-        when(catService.findAllByHealth(true))
-                .thenReturn(LIST_OF_HEALTHY_CATS);
-
+        when(catService.findAllByHealth(true)).thenReturn(LIST_OF_HEALTHY_CATS);
         this.mockMvc.perform(
-                        get("/cat/filter"))
+                        get("/cat/filter/?isHealthy=true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", Matchers.hasSize(LIST_OF_HEALTHY_CATS.size())));
     }
 
     @Test
     void findAllByHealthAndVaccination_ShouldReturn_ListOfVaccinatedCats() throws Exception {
-        when(catRepository.findAllByVaccination(true)).thenReturn(LIST_OF_VACCINATED_CATS);
         when(catService.findAllByVaccinate(true)).thenReturn(LIST_OF_VACCINATED_CATS);
         this.mockMvc.perform(
-                        get("/cat/filter"))
+                        get("/cat/filter?isVaccinated=true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", Matchers.hasSize(LIST_OF_VACCINATED_CATS.size())));
     }
 
     @Test
     void findAllByHealthAndVaccination_ShouldReturn_ListOfHealthyAndUnvaccinatedCats() throws Exception {
-        when(catRepository.findAllByHealthAndVaccination(true, false))
-                .thenReturn(LIST_OF_HEALTHY_AND_UNVACCINATED_CATS);
         when(catService.findAllByHealthAndVaccination(true, false))
                 .thenReturn(LIST_OF_HEALTHY_AND_UNVACCINATED_CATS);
         this.mockMvc.perform(
-                        get("/cat/filter")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(LIST_OF_HEALTHY_AND_UNVACCINATED_CATS)))
+                        get("/cat/filter/?isHealthy=true&isVaccinated=false")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(LIST_OF_HEALTHY_AND_UNVACCINATED_CATS)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*", Matchers.hasSize(LIST_OF_HEALTHY_AND_UNVACCINATED_CATS.size())));
     }
@@ -167,22 +156,30 @@ class CatControllerTest {
 
     @Test
     void updateById_ShouldReturn200() throws Exception {
-        when(catRepository.save(CORRECT_CAT_1)).thenReturn(CORRECT_CAT_1);
-        when(catService.save(CORRECT_CAT_1)).thenReturn(true);
-        when(catRepository.findById(CORRECT_CAT_1.getId())).thenReturn(Optional.of(CORRECT_CAT_1));
-        when(catService.findById(CORRECT_CAT_1.getId())).thenReturn(Optional.of(CORRECT_CAT_1));
-        when(catRepository.updateById(CORRECT_CAT_1.getId(), CORRECT_CAT_1.getName(), CORRECT_CAT_1.getAge(), CORRECT_CAT_1.getHealthy(), CORRECT_CAT_1.getVaccinated())).thenReturn(1);
-        when(catService.updateById(CORRECT_CAT_1.getId(), CORRECT_CAT_1.getName(), CORRECT_CAT_1.getAge(), CORRECT_CAT_1.getHealthy(), CORRECT_CAT_1.getVaccinated()))
-                .thenReturn(1);
+        when(catService.updateById(
+                CORRECT_CAT_1.getId(),
+                CORRECT_CAT_1.getName(),
+                CORRECT_CAT_1.getAge(),
+                CORRECT_CAT_1.getHealthy(),
+                CORRECT_CAT_1.getVaccinated())).thenReturn(1);
+        final String pathAndQueryUri = String.format("/cat/%d?name=%s&age=%d&isHealthy=%b&isVaccinated=%b",
+                CORRECT_CAT_1.getId(),
+                CORRECT_CAT_1.getName(),
+                CORRECT_CAT_1.getAge(),
+                CORRECT_CAT_1.getHealthy(),
+                CORRECT_CAT_1.getVaccinated());
         this.mockMvc.perform(
-                        put("/cat/{id}", CORRECT_CAT_1.getId()))
-                .andExpect(status().isOk());
+                put(pathAndQueryUri)).andExpect(status().isOk());
     }
 
     @Test
     void updateById_ShouldReturn400() throws Exception {
-        when(catRepository.findById(INCORRECT_CAT.getId())).thenReturn(Optional.empty());
-        when(catService.updateById(INCORRECT_CAT.getId(), INCORRECT_CAT.getName(), INCORRECT_CAT.getAge(), INCORRECT_CAT.getHealthy(), INCORRECT_CAT.getVaccinated()))
+        when(catService.updateById(
+                INCORRECT_CAT.getId(),
+                INCORRECT_CAT.getName(),
+                INCORRECT_CAT.getAge(),
+                INCORRECT_CAT.getHealthy(),
+                INCORRECT_CAT.getVaccinated()))
                 .thenReturn(0);
         this.mockMvc.perform(
                         put("/cat/{id}", INCORRECT_CAT.getId()))
