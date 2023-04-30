@@ -172,10 +172,10 @@ public class DogController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<Integer> updateById(@PathVariable Integer id,
-                                          @RequestParam String name,
-                                          @RequestParam Integer age,
-                                          @RequestParam Boolean isHealthy,
-                                          @RequestParam Boolean isVaccinated) {
+                                              @RequestParam String name,
+                                              @RequestParam Integer age,
+                                              @RequestParam Boolean isHealthy,
+                                              @RequestParam Boolean isVaccinated) {
         Integer number = dogService.updateById(id, name, age, isHealthy, isVaccinated);
         if (number == 0) {
             return ResponseEntity.badRequest().build();
