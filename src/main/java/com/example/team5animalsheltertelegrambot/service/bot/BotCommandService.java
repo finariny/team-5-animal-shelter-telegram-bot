@@ -7,7 +7,8 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 
 import javax.validation.constraints.NotNull;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Сервис реализующий команды Телеграм бота
@@ -56,8 +57,10 @@ public interface BotCommandService {
 
     /**
      * Запускает интерфейс для отчета
+     *
+     * @return
      */
-    void runReport(Long chatId, Update update);
+    void runReport(Message message);
 
     /**
      * Вызывает волонтера
