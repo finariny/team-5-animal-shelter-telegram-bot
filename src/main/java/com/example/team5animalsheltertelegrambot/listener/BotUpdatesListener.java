@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Optional;
+
 
 /**
  * Основной класс для работы с Телеграм.
@@ -29,6 +29,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BotUpdatesListener implements UpdatesListener {
+
     private final Logger logger = LoggerFactory.getLogger(BotUpdatesListener.class);
 
     private final TelegramBot telegramBot;
@@ -66,6 +67,8 @@ public class BotUpdatesListener implements UpdatesListener {
             if (update.message() != null) {
                 handleMessage(update.message());
             }
+
+
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
@@ -94,6 +97,8 @@ public class BotUpdatesListener implements UpdatesListener {
                 case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                 case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                 case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
+                case REPORT -> botCommandService.runReport(callbackQuery.message());
+
             }
         } catch (Exception e) {
             logger.error("Ошибка обработки обратного вызова: {}", e.getMessage());
@@ -146,12 +151,11 @@ public class BotUpdatesListener implements UpdatesListener {
                         botCommandService.runStart(chatId);
                     }
                     case INFO -> botCommandService.runInfo(chatId, animalShelter);
-                    case REPORT -> botCommandService.runReport(chatId, new Update());
+                    case REPORT -> botCommandService.runReport(message);
                     case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                     case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                     case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
-
                 }
             }
         } catch (Exception e) {
