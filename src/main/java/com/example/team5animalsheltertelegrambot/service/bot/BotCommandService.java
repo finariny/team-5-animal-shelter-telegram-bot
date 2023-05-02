@@ -64,6 +64,8 @@ public interface BotCommandService {
      */
     void runVolunteer(Long chatId);
 
+    void sendMessageToVolunteer(Long chatId, String text);
+
     void runContact(Long chatId, AnimalShelter  shelter);
     void runAdvice(Long chatId, AnimalShelter  shelter);
 

@@ -25,7 +25,7 @@ public enum CommandType {
     SHELTER("/shelter", "О приюте"),
     LOCATION("/location","Расписание работы приюта, адрес и схема проезда"),
     CONTACT("/contact", "телефон для связи"),
-    ADVICE("/advice","рекомендации для будущих хозяев");
+    ADVICE("/advice","Как стать хозяином питомца. Рекомендации");
 
 
     private final String command;
