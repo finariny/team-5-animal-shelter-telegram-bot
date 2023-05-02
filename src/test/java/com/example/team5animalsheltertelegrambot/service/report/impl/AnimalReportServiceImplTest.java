@@ -21,6 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 class AnimalReportServiceImplTest {
 
+
+
     @Mock
     private AnimalReportRepository animalReportRepositoryMock;
 
