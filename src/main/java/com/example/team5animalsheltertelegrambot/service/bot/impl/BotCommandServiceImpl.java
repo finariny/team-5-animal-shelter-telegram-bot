@@ -1,5 +1,6 @@
 package com.example.team5animalsheltertelegrambot.service.bot.impl;
 
+import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
@@ -236,7 +237,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     public void sendMessageToVolunteer(Long chatId, String text) {
         Customer customer = customerRepository.findByChatId(chatId).get();
         //Отправка сообщения в чат с волонтерами
-        String volunteerMessage = String.format("*%s* (@%s) зовёт волонтёра! Его номер телефона: %s А так же прикрепленное сообщение: %s", customer.getFirstName(), chatId, customer.getPhone(), text);
+        String volunteerMessage = String.format("*%s* (@%s) зовёт волонтёра! Его номер телефона: %s. А так же прикрепленное сообщение: %s", customer.getFirstName(), chatId, customer.getPhone(), text);
         String escapedVolunteerMessage = volunteerMessage;
 //                .replace("(", "\\(")
 //                .replace(")", "\\)")
@@ -345,6 +346,9 @@ public class BotCommandServiceImpl implements BotCommandService {
         InlineKeyboardButton reportAnimalButton = new InlineKeyboardButton(REPORT.getDescription());
         reportAnimalButton.callbackData(REPORT.toString());
 
+        InlineKeyboardButton getUserPhoneButton = new InlineKeyboardButton(PHONE.getDescription());
+        getUserPhoneButton.callbackData(PHONE.toString());
+
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getDescription());
         volunteerButton.callbackData(VOLUNTEER.toString());
 
@@ -354,11 +358,13 @@ public class BotCommandServiceImpl implements BotCommandService {
                 .addRow(infoShelterButton)
                 .addRow(adviceButton)
                 .addRow(reportAnimalButton)
+                .addRow(getUserPhoneButton)
                 .addRow(volunteerButton);
 
         // Создание сообщения, добавление в него клавиатуры с рядом кнопок
         SendMessage sendMessage = new SendMessage(chatId, "*Выберите действие*");
         sendMessage.replyMarkup(inlineKeyboardMarkup);
+
 
         // Отправка сообщения
 

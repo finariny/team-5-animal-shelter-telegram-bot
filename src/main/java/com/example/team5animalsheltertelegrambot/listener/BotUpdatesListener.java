@@ -67,21 +67,20 @@ public class BotUpdatesListener implements UpdatesListener {
                 if (update.message().text() != null) { //проверка на наличие текста в сообщении
                     String text = update.message().text();
                     //Далее проверки - если сообщение пришло в ответ на сообщение бота
-                    if (update.message().replyToMessage().text().equals(TELEPHONE)||
-                            update.message().replyToMessage().text().equals(PHONE_AGAIN)
+                    if (update.message().replyToMessage() != null && update.message().replyToMessage().text().equals(TELEPHONE)||
+                            update.message().replyToMessage() != null && update.message().replyToMessage().text().equals(PHONE_AGAIN)
                     ) {
                         //если сообщение пришло в ответ на кнопку "Телефон"
                         botCommandService.saveTelephone(chatId, text);
                     }
-                    if (update.message().replyToMessage() != null &&
+                    else if (update.message().replyToMessage() != null &&
                             !update.message().replyToMessage().text().isEmpty()) {
                         //если сообщение пришло в ответ на кнопку "позвать волонтера" с любым текстом
                         botCommandService.sendMessageToVolunteer(chatId, text);
                     }
-                    handleMessage(update.message());
                 }
+                handleMessage(update.message());
             }
-
             if (update.callbackQuery() != null) {
                 handleCallback(update.callbackQuery());
             }
@@ -113,7 +112,7 @@ public class BotUpdatesListener implements UpdatesListener {
                 }
                 case INFO -> botCommandService.runInfo(chatId, animalShelter);
                 case CONTACT -> botCommandService.runContact(chatId, animalShelter);
-                case TELEPHONE -> botCommandService.runTelephone(chatId);
+                case PHONE -> botCommandService.runTelephone(chatId);
                 case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                 case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
                 case VOLUNTEER -> {
