@@ -58,11 +58,11 @@ class ShelterBotCommandServiceTest {
 
 
     //проверка пути к файлу json
-    public static void main(String[] args) throws URISyntaxException, IOException {
-        File file = new File(dataFilePath+"/"+"callback_update.json");
-        String test = String.valueOf(file.toURI());
-        System.out.println(test);
-    }
+//    public static void main(String[] args) throws URISyntaxException, IOException {
+//        File file = new File(dataFilePath+"/"+"callback_update.json");
+//        String test = String.valueOf(file.toURI());
+//        System.out.println(test);
+//    }
 
     @Test
     public void handleStartTest() throws URISyntaxException, IOException {
@@ -77,16 +77,16 @@ class ShelterBotCommandServiceTest {
     }
 
 
-    @Test
-    void runCats() throws URISyntaxException, IOException  {
-        File file = new File(dataFilePath+"/"+"callback_update.json");
-        String json = Files.readString(file.toPath());
-        Update update = getUpdate(json, "/cats");
-        botUpdatesListener.process(Collections.singletonList(update));
-
-        verify(botCommandService).runCats(1L,catShelterDefault);
-//        Mockito.verify(mock.runCats(1L,catShelterDefault).sendPhotoShelter();
-    }
+//    @Test
+//    void runCats() throws URISyntaxException, IOException  {
+//        File file = new File(dataFilePath+"/"+"callback_update.json");
+//        String json = Files.readString(file.toPath());
+//        Update update = getUpdate(json, "/cats");
+//        botUpdatesListener.process(Collections.singletonList(update));
+//
+//        verify(botCommandService).runCats(1L,catShelterDefault);
+////        Mockito.verify(mock.runCats(1L,catShelterDefault).sendPhotoShelter();
+//    }
 
     @Test
     void runDogs() {

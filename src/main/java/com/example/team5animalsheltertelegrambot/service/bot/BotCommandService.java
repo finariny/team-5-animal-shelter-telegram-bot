@@ -5,7 +5,6 @@ import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 
 import javax.validation.constraints.NotNull;
-import java.util.Optional;
 
 /**
  * Сервис реализующий команды Телеграм бота
@@ -63,6 +62,10 @@ public interface BotCommandService {
      * @param chatId идентификатор чата Телеграм
      */
     void runVolunteer(Long chatId);
+
+    void runTelephone(Long chatId);
+
+    void saveTelephone(long chatId, String phone);
 
     void sendMessageToVolunteer(Long chatId, String text);
 
