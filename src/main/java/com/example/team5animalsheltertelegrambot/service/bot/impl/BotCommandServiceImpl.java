@@ -1,5 +1,6 @@
 package com.example.team5animalsheltertelegrambot.service.bot.impl;
 
+import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
@@ -9,14 +10,12 @@ import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.PhotoSize;
-import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.*;
 import com.pengrad.telegrambot.response.GetFileResponse;
-import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -30,11 +29,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 import static com.example.team5animalsheltertelegrambot.configuration.CommandType.*;
+import static com.example.team5animalsheltertelegrambot.service.ValidationRegularService.validateTelephone;
 import static java.time.LocalDateTime.parse;
 
 @Service
@@ -47,6 +46,10 @@ public class BotCommandServiceImpl implements BotCommandService {
     private final TelegramProperties telegramProperties;
 
     private final CustomerRepository customerRepository;
+
+    //Константы сообщений для проверки reply сообщений с телефоном
+    public static final String TELEPHONE = "Что бы мы могли с Вами связаться, напишите в чат ваш номер телефона.";
+    public static final String PHONE_AGAIN = "Номер телефона не прошел проверку, пожалуйста, введите еще раз";
 
 
     @Override
@@ -184,24 +187,57 @@ public class BotCommandServiceImpl implements BotCommandService {
         }
     }
 
+    /**
+     * Обработка нажатия кнопки "позвать Волонтера". Запрос на сообщение для волонтеров
+     */
     @Override
     public void runVolunteer(Long chatId) {
-        StringBuilder stringBuilder = new StringBuilder();
-
         System.out.println("после нажатия кнопки Волонтер");
         //Отправка сообщения в чат с ботом
-        String customerMessage = "Что бы волонтер мог с Вами связаться, напишите в чат ваш номер телефона или другую контактную информацию.";
+        String customerMessage = "Что бы волонтер мог с Вами связаться, напишите в чат по какому вопросу вы обращаетесь.";
         SendMessage sendMessage = new SendMessage(chatId, customerMessage);
         sendMessage.replyMarkup(new ForceReply());
+        telegramBot.execute(sendMessage);
+    }
+
+    /**
+     * Обработка нажатия кнопки "Оставить номер телефона". Запрос на ответное сообщение с телефоном
+     */
+    @Override
+    public void runTelephone(Long chatId) {
+        System.out.println("после нажатия кнопки runTelephone");
+        //Отправка сообщения в чат с ботом
+        SendMessage sendMessage = new SendMessage(chatId, TELEPHONE);
+        sendMessage.replyMarkup(new ForceReply()); // новый диалог
         telegramBot.execute(sendMessage);
 
     }
 
     @Override
+    public void saveTelephone(long chatId, String phone) {
+        Customer customer = customerRepository.findByChatId(chatId).orElseThrow();
+
+        if (validateTelephone(phone)) {
+            customer.setPhone(phone);
+            customerRepository.save(customer);
+            SendMessage sendMessage = new SendMessage(chatId, "Номер телефона принят!");
+            telegramBot.execute(sendMessage);
+        } else {
+            SendMessage sendMessage = new SendMessage(chatId, PHONE_AGAIN);
+            sendMessage.replyMarkup(new ForceReply()); // новый диалог "Телефон заново!"
+            telegramBot.execute(sendMessage);
+        }
+    }
+
+
+    /**
+     * Метод отправляющий сообщение в чат волонтеров
+     */
+    @Override
     public void sendMessageToVolunteer(Long chatId, String text) {
         Customer customer = customerRepository.findByChatId(chatId).get();
         //Отправка сообщения в чат с волонтерами
-        String volunteerMessage = String.format("*%s* (@%s) зовёт волонтёра! Прикрепленное сообщение: %s", customer.getFirstName(), chatId, text);
+        String volunteerMessage = String.format("*%s* (@%s) зовёт волонтёра! Его номер телефона: %s. А так же прикрепленное сообщение: %s", customer.getFirstName(), chatId, customer.getPhone(), text);
         String escapedVolunteerMessage = volunteerMessage;
 //                .replace("(", "\\(")
 //                .replace(")", "\\)")
@@ -212,34 +248,6 @@ public class BotCommandServiceImpl implements BotCommandService {
         telegramBot.execute(sendVolunteerMessage);
     }
 
-    /**
-     * Метод запускающий считывание сообщений внутри метода runVolunteer
-     */
-
-    private StringBuilder waitMessage(StringBuilder stringBuilder) {
-        GetUpdates getUpdates = new GetUpdates().limit(100).offset(0).timeout(0);
-        GetUpdatesResponse updatesResponse = telegramBot.execute(getUpdates);
-        List<Update> updates = updatesResponse.updates();
-        System.out.println("Начало ожидания ввода сообщения");
-
-        updates.stream().filter(update -> update.message() != null).forEach(update -> {
-            System.out.println("поехал стрим");
-            logger.info("Handles update: {}", update);
-            Message message = update.message();
-            long chatId = message.chat().id();
-            System.out.println(chatId);
-            String text = message.text().replace("+", "\\+");
-            System.out.println(text);
-            stringBuilder.append(text);
-            System.out.println(stringBuilder);
-
-            if (text != null) {
-                sendMessage(chatId, "Мы приняли ваше сообщение для волонтеров. Волонтёр скоро свяжется с Вами!");
-            }
-        });
-        System.out.println(stringBuilder);
-        return stringBuilder;
-    }
 
     /**
      * Отправка сообщения с контактами приюта
@@ -338,6 +346,9 @@ public class BotCommandServiceImpl implements BotCommandService {
         InlineKeyboardButton reportAnimalButton = new InlineKeyboardButton(REPORT.getDescription());
         reportAnimalButton.callbackData(REPORT.toString());
 
+        InlineKeyboardButton getUserPhoneButton = new InlineKeyboardButton(PHONE.getDescription());
+        getUserPhoneButton.callbackData(PHONE.toString());
+
         InlineKeyboardButton volunteerButton = new InlineKeyboardButton(VOLUNTEER.getDescription());
         volunteerButton.callbackData(VOLUNTEER.toString());
 
@@ -347,11 +358,13 @@ public class BotCommandServiceImpl implements BotCommandService {
                 .addRow(infoShelterButton)
                 .addRow(adviceButton)
                 .addRow(reportAnimalButton)
+                .addRow(getUserPhoneButton)
                 .addRow(volunteerButton);
 
         // Создание сообщения, добавление в него клавиатуры с рядом кнопок
         SendMessage sendMessage = new SendMessage(chatId, "*Выберите действие*");
         sendMessage.replyMarkup(inlineKeyboardMarkup);
+
 
         // Отправка сообщения
 

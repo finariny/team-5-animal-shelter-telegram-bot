@@ -3,12 +3,8 @@ package com.example.team5animalsheltertelegrambot.service.bot;
 import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
 
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Сервис реализующий команды Телеграм бота
@@ -57,10 +53,8 @@ public interface BotCommandService {
 
     /**
      * Запускает интерфейс для отчета
-     *
-     * @return
      */
-    void runReport(Message message);
+    void runReport();
 
     /**
      * Вызывает волонтера
@@ -68,6 +62,10 @@ public interface BotCommandService {
      * @param chatId идентификатор чата Телеграм
      */
     void runVolunteer(Long chatId);
+
+    void runTelephone(Long chatId);
+
+    void saveTelephone(long chatId, String phone);
 
     void sendMessageToVolunteer(Long chatId, String text);
 

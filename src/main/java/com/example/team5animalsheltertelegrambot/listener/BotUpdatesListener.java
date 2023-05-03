@@ -20,12 +20,13 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.Optional;
+
+import static com.example.team5animalsheltertelegrambot.service.bot.impl.BotCommandServiceImpl.PHONE_AGAIN;
+import static com.example.team5animalsheltertelegrambot.service.bot.impl.BotCommandServiceImpl.TELEPHONE;
 
 /**
  * Основной класс для работы с Телеграм.
  * Реализует интерфейс {@link UpdatesListener} для обработки обратного вызова с доступными обновлениями
- *
  */
 @Service
 @RequiredArgsConstructor
@@ -61,19 +62,25 @@ public class BotUpdatesListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Обработка обновления: {}", update);
-            if (update.message() != null) {
-                if (update.message().text() != null) {
-                    if (update.message().replyToMessage() != null &&
+            if (update.message() != null) { //проверка на пустой апдейт
+                Long chatId = update.message().chat().id();
+                if (update.message().text() != null) { //проверка на наличие текста в сообщении
+                    String text = update.message().text();
+                    //Далее проверки - если сообщение пришло в ответ на сообщение бота
+                    if (update.message().replyToMessage() != null && update.message().replyToMessage().text().equals(TELEPHONE)||
+                            update.message().replyToMessage() != null && update.message().replyToMessage().text().equals(PHONE_AGAIN)
+                    ) {
+                        //если сообщение пришло в ответ на кнопку "Телефон"
+                        botCommandService.saveTelephone(chatId, text);
+                    }
+                    else if (update.message().replyToMessage() != null &&
                             !update.message().replyToMessage().text().isEmpty()) {
-                        System.out.println("После ответа на сообщение бота (if reply в process())");
-                        Long chatId = update.message().chat().id();
-                        String text = update.message().text();
+                        //если сообщение пришло в ответ на кнопку "позвать волонтера" с любым текстом
                         botCommandService.sendMessageToVolunteer(chatId, text);
                     }
-                    handleMessage(update.message());
                 }
+                handleMessage(update.message());
             }
-
             if (update.callbackQuery() != null) {
                 handleCallback(update.callbackQuery());
             }
@@ -90,7 +97,8 @@ public class BotUpdatesListener implements UpdatesListener {
     private void handleCallback(CallbackQuery callbackQuery) {
         String callbackQueryData = callbackQuery.data();
         Long chatId = callbackQuery.from().id();
-//        Long chatId = 1l;
+        Customer customer = customerRepository.findByChatId(chatId).orElseThrow();
+
         CommandType commandType = CommandType.valueOf(callbackQueryData);
         try {
             switch (commandType) {
@@ -104,9 +112,17 @@ public class BotUpdatesListener implements UpdatesListener {
                 }
                 case INFO -> botCommandService.runInfo(chatId, animalShelter);
                 case CONTACT -> botCommandService.runContact(chatId, animalShelter);
+                case PHONE -> botCommandService.runTelephone(chatId);
                 case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                 case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
-                case VOLUNTEER -> botCommandService.runVolunteer(chatId);
+                case VOLUNTEER -> {
+                    if (customer.getPhone() != null) {
+                        botCommandService.runVolunteer(chatId);
+                    } else {
+                        SendMessage sendMessage = new SendMessage(chatId, "Прежде чем позвать волонтера - укажите ваш номер телефона!");
+                        telegramBot.execute(sendMessage);
+                    }
+                }
             }
         } catch (Exception e) {
             logger.error("Ошибка обработки обратного вызова: {}", e.getMessage());
@@ -145,11 +161,11 @@ public class BotUpdatesListener implements UpdatesListener {
                     case ABOUT -> botCommandService.runAbout(customer);
                     case ADOPT -> botCommandService.runAdopt();
                     case CATS -> {
-                        animalShelter= catShelterRepository.findById(2).orElse(null);
+                        animalShelter = catShelterRepository.findById(2).orElse(null);
                         botCommandService.runCats(chatId, animalShelter);
                     }
                     case DOGS -> {
-                        animalShelter= dogShelterRepository.getReferenceById(1);
+                        animalShelter = dogShelterRepository.getReferenceById(1);
                         botCommandService.runDogs(chatId, animalShelter);
                     }
                     case START -> {
