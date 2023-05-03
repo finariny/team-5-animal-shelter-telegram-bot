@@ -12,6 +12,7 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-
+import java.util.Optional;
 
 /**
  * Основной класс для работы с Телеграм.
@@ -29,7 +30,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BotUpdatesListener implements UpdatesListener {
-
     private final Logger logger = LoggerFactory.getLogger(BotUpdatesListener.class);
 
     private final TelegramBot telegramBot;
@@ -60,15 +60,23 @@ public class BotUpdatesListener implements UpdatesListener {
     @Override
     public int process(List<Update> updates) {
         updates.forEach(update -> {
-            logger.debug("Обработка обновления: {}", update);
+            logger.info("Обработка обновления: {}", update);
+            if (update.message() != null) {
+                if (update.message().text() != null) {
+                    if (update.message().replyToMessage() != null &&
+                            !update.message().replyToMessage().text().isEmpty()) {
+                        System.out.println("После ответа на сообщение бота (if reply в process())");
+                        Long chatId = update.message().chat().id();
+                        String text = update.message().text();
+                        botCommandService.sendMessageToVolunteer(chatId, text);
+                    }
+                    handleMessage(update.message());
+                }
+            }
+
             if (update.callbackQuery() != null) {
                 handleCallback(update.callbackQuery());
             }
-            if (update.message() != null) {
-                handleMessage(update.message());
-            }
-
-
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
@@ -82,6 +90,7 @@ public class BotUpdatesListener implements UpdatesListener {
     private void handleCallback(CallbackQuery callbackQuery) {
         String callbackQueryData = callbackQuery.data();
         Long chatId = callbackQuery.from().id();
+//        Long chatId = 1l;
         CommandType commandType = CommandType.valueOf(callbackQueryData);
         try {
             switch (commandType) {
@@ -97,8 +106,7 @@ public class BotUpdatesListener implements UpdatesListener {
                 case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                 case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                 case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
-                case REPORT -> botCommandService.runReport(callbackQuery.message());
-
+                case VOLUNTEER -> botCommandService.runVolunteer(chatId);
             }
         } catch (Exception e) {
             logger.error("Ошибка обработки обратного вызова: {}", e.getMessage());
@@ -151,11 +159,12 @@ public class BotUpdatesListener implements UpdatesListener {
                         botCommandService.runStart(chatId);
                     }
                     case INFO -> botCommandService.runInfo(chatId, animalShelter);
-                    case REPORT -> botCommandService.runReport(message);
+                    case REPORT -> botCommandService.runReport();
                     case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                     case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                     case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
+
                 }
             }
         } catch (Exception e) {
