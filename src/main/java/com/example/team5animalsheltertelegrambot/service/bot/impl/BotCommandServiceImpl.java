@@ -68,6 +68,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     //Константы сообщений для проверки reply сообщений с телефоном
     public static final String TELEPHONE = "Что бы мы могли с Вами связаться, напишите в чат ваш номер телефона.";
     public static final String PHONE_AGAIN = "Номер телефона не прошел проверку, пожалуйста, введите еще раз";
+    public static final String VOLUNTEER_MESSAGE = "Что бы волонтер мог с Вами связаться, напишите в чат по какому вопросу вы обращаетесь.";
 
     private static final String MESSAGE = """
             (ID животного:)(\\s)(\\d+)(;)
@@ -252,7 +253,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     public void runVolunteer(Long chatId) {
         System.out.println("после нажатия кнопки Волонтер");
         //Отправка сообщения в чат с ботом
-        String customerMessage = "Что бы волонтер мог с Вами связаться, напишите в чат по какому вопросу вы обращаетесь.";
+        String customerMessage = VOLUNTEER_MESSAGE;
         SendMessage sendMessage = new SendMessage(chatId, customerMessage);
         sendMessage.replyMarkup(new ForceReply());
         telegramBot.execute(sendMessage);
