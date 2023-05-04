@@ -1,0 +1,13 @@
+{
+  "callback_query":
+
+  {
+    "data": "%command%",
+    "message": {
+      "chat": {
+        "id": 1,
+        "first_name": "КОТОПЁС"
+      }
+    }
+  }
+}

@@ -25,7 +25,7 @@ objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
             <column autoIncrement="true" name="ID" startWith="1" type="INT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="PK_ANIMAL_REPORT"/>
             </column>
-            <column name="NAME" type="VARCHAR(255)"/>
+<!--            <column name="NAME" type="VARCHAR(255)"/>-->
             <column name="PHOTO" type="VARCHAR(255)"/>
             <column name="DIET" type="VARCHAR(255)"/>
             <column name="WELL_BEING" type="VARCHAR(255)"/>
