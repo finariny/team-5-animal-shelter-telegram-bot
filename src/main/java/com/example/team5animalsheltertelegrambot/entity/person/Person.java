@@ -17,6 +17,9 @@ public class Person extends BaseEntity {
     @Column(name = "LAST_NAME")
     private String lastName;
 
+    @Column(name = "PHONE", length = 30)
+    private String phone;
+
     public String getFirstName() {
         return firstName;
     }
@@ -31,6 +34,14 @@ public class Person extends BaseEntity {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override
