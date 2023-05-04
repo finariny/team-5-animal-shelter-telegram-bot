@@ -1,5 +1,6 @@
 package com.example.team5animalsheltertelegrambot.entity.report;
 
+import com.example.team5animalsheltertelegrambot.entity.BaseEntity;
 import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
         @Index(name = "IDX_ANIMAL_REPORT_ANIMAL", columnList = "ANIMAL_ID"),
         @Index(name = "IDX_ANIMAL_REPORT_CUSTOMER", columnList = "CUSTOMER_ID")
 })
-public class AnimalReport extends NamedEntity {
+public class AnimalReport extends BaseEntity {
 
     @Column(name = "PHOTO")
     private String photo;
@@ -36,6 +37,39 @@ public class AnimalReport extends NamedEntity {
     @JoinColumn(name = "CUSTOMER_ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private Customer customer;
+
+    public AnimalReport(String photo,
+                        String diet,
+                        String wellBeing,
+                        String behavior,
+                        LocalDateTime dateCreate,
+                        Animal animal,
+                        Customer customer) {
+        this.photo = photo;
+        this.diet = diet;
+        this.wellBeing = wellBeing;
+        this.behavior = behavior;
+        this.dateCreate = dateCreate;
+        this.animal = animal;
+        this.customer = customer;
+    }
+
+    public AnimalReport(String diet, String wellBeing, String behavior) {
+        this.diet = diet;
+        this.wellBeing = wellBeing;
+        this.behavior = behavior;
+    }
+
+    public AnimalReport(String photo, String diet, String wellBeing, String behavior) {
+        this.photo = photo;
+        this.diet = diet;
+        this.wellBeing = wellBeing;
+        this.behavior = behavior;
+    }
+
+    public AnimalReport() {
+
+    }
 
     public String getPhoto() {
         return photo;
@@ -92,4 +126,5 @@ public class AnimalReport extends NamedEntity {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
 }

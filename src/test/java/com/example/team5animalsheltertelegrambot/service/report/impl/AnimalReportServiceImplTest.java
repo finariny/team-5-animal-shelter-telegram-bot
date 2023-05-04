@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.Mockito.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,61 +31,52 @@ class AnimalReportServiceImplTest {
     @InjectMocks
     private AnimalReportServiceImpl service;
 
-    @Test
-    void uploadAnimalReportTest() {
+    AnimalReport animalReport() {
         AnimalReport expected = new AnimalReport();
         expected.setPhoto("photo");
         expected.setDiet("diet");
         expected.setWellBeing("wellBeing");
         expected.setBehavior("behavior");
+        return expected;
+    }
 
-        Mockito.when(animalReportRepositoryMock.save(any(AnimalReport.class))).thenReturn(expected);
-        AnimalReport actual = service.save(expected);
-
-        Assertions.assertThat(actual.getDiet()).isEqualTo(expected.getDiet());
-        Assertions.assertThat(actual.getWellBeing()).isEqualTo(expected.getWellBeing());
-        Assertions.assertThat(actual.getBehavior()).isEqualTo(expected.getBehavior());
-        Assertions.assertThat(actual.getPhoto()).isEqualTo(expected.getPhoto());
+    @Test
+    void uploadAnimalReportTest() {
+        Mockito.when(animalReportRepositoryMock.save(any(AnimalReport.class))).thenReturn(animalReport());
+        AnimalReport actual = service.save(animalReport());
+        Assertions.assertThat(actual.getDiet()).isEqualTo(animalReport().getDiet());
+        Assertions.assertThat(actual.getWellBeing()).isEqualTo(animalReport().getWellBeing());
+        Assertions.assertThat(actual.getBehavior()).isEqualTo(animalReport().getBehavior());
+        Assertions.assertThat(actual.getPhoto()).isEqualTo(animalReport().getPhoto());
 
     }
 
     @Test
     void findByIdTest() {
-        AnimalReport expected = new AnimalReport();
-        expected.setPhoto("photo");
-        expected.setWellBeing("здоровье");
-        expected.setBehavior("behaviorTest");
-        expected.setDiet("dietTest");
-        Mockito.when(animalReportRepositoryMock.findById(any(Integer.class))).thenReturn(Optional.of(expected));
-
+        Mockito.when(animalReportRepositoryMock.findById(any(Integer.class))).thenReturn(Optional.of(animalReport()));
         AnimalReport actual = service.findById(1);
-
-        Assertions.assertThat(actual.getPhoto()).isEqualTo(expected.getPhoto());
-        Assertions.assertThat(actual.getWellBeing()).isEqualTo(expected.getWellBeing());
-        Assertions.assertThat(actual.getBehavior()).isEqualTo(expected.getBehavior());
-        Assertions.assertThat(actual.getDiet()).isEqualTo(expected.getDiet());
-
+        Assertions.assertThat(actual.getPhoto()).isEqualTo(animalReport().getPhoto());
+        Assertions.assertThat(actual.getWellBeing()).isEqualTo(animalReport().getWellBeing());
+        Assertions.assertThat(actual.getBehavior()).isEqualTo(animalReport().getBehavior());
+        Assertions.assertThat(actual.getDiet()).isEqualTo(animalReport().getDiet());
     }
 
     @Test
     void getAllTest() {
         List<AnimalReport> expected = new ArrayList<>();
-        AnimalReport reportTest = new AnimalReport();
-
-        reportTest.setPhoto("test");
-        reportTest.setWellBeing("wellBeing");
-        reportTest.setBehavior("test");
-        reportTest.setDiet("test");
-        expected.add(reportTest);
-
+        expected.add(animalReport());
         Mockito.when(animalReportRepositoryMock.findAll()).thenReturn(expected);
         Collection<AnimalReport> actual = animalReportRepositoryMock.findAll();
-
         Assertions.assertThat(actual.size()).isEqualTo(expected.size());
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
+
     @Test
     void remove() {
+        Mockito.when(animalReportRepositoryMock.findById(any(Integer.class))).thenReturn(Optional.of(animalReport()));
+        doNothing().when(animalReportRepositoryMock).deleteById(anyInt());
+        service.remove(1);
+        verify(animalReportRepositoryMock, times(1)).deleteById(anyInt());
     }
 }

@@ -10,6 +10,7 @@ import com.example.team5animalsheltertelegrambot.repository.AnimalReportReposito
 import com.example.team5animalsheltertelegrambot.service.report.AnimalReportService;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +31,7 @@ public class AnimalReportServiceImpl implements AnimalReportService {
 
     @Override
     public void uploadAnimalReport(
-            String photo
+             String photo
             , String diet
             , String wellBeing
             , String behavior
@@ -57,7 +58,10 @@ public class AnimalReportServiceImpl implements AnimalReportService {
 
     @Override
     public AnimalReport save(AnimalReport report) {
-        return this.animalReportRepository.save(report);
+        if (report != null) {
+           this.animalReportRepository.save(report);
+        }
+        return report;
     }
 
     @Override
