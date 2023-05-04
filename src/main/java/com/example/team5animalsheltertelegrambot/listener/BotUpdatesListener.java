@@ -23,6 +23,7 @@ import java.util.List;
 
 import static com.example.team5animalsheltertelegrambot.service.bot.impl.BotCommandServiceImpl.*;
 
+
 /**
  * Основной класс для работы с Телеграм.
  * Реализует интерфейс {@link UpdatesListener} для обработки обратного вызова с доступными обновлениями
@@ -82,6 +83,13 @@ public class BotUpdatesListener implements UpdatesListener {
             if (update.callbackQuery() != null) {
                 handleCallback(update.callbackQuery());
             }
+            if (update.message() != null) {
+
+                handleMessage(update.message());
+                if (update.message().photo() != null && update.message().caption() != null) {
+                    botCommandService.saveText(update);
+                }
+            }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
@@ -121,6 +129,8 @@ public class BotUpdatesListener implements UpdatesListener {
                         telegramBot.execute(sendMessage);
                     }
                 }
+                case REPORT -> botCommandService.runReport(callbackQuery.message());
+
             }
         } catch (Exception e) {
             logger.error("Ошибка обработки обратного вызова: {}", e.getMessage());
@@ -173,12 +183,11 @@ public class BotUpdatesListener implements UpdatesListener {
                         botCommandService.runStart(chatId);
                     }
                     case INFO -> botCommandService.runInfo(chatId, animalShelter);
-                    case REPORT -> botCommandService.runReport();
+                    case REPORT -> botCommandService.runReport(message);
                     case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                     case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                     case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
-
                 }
             }
         } catch (Exception e) {

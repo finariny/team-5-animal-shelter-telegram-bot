@@ -3,6 +3,8 @@ package com.example.team5animalsheltertelegrambot.service.bot;
 import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.Update;
 
 import javax.validation.constraints.NotNull;
 
@@ -53,9 +55,12 @@ public interface BotCommandService {
 
     /**
      * Запускает интерфейс для отчета
+     *
+     * @return
      */
-    void runReport();
+    void runReport(Message message);
 
+    void saveText(Update update);
     /**
      * Вызывает волонтера
      *
