@@ -21,8 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-import static com.example.team5animalsheltertelegrambot.service.bot.impl.BotCommandServiceImpl.PHONE_AGAIN;
-import static com.example.team5animalsheltertelegrambot.service.bot.impl.BotCommandServiceImpl.TELEPHONE;
+import static com.example.team5animalsheltertelegrambot.service.bot.impl.BotCommandServiceImpl.*;
 
 /**
  * Основной класс для работы с Телеграм.
@@ -73,8 +72,7 @@ public class BotUpdatesListener implements UpdatesListener {
                         //если сообщение пришло в ответ на кнопку "Телефон"
                         botCommandService.saveTelephone(chatId, text);
                     }
-                    else if (update.message().replyToMessage() != null &&
-                            !update.message().replyToMessage().text().isEmpty()) {
+                    else if (update.message().replyToMessage() != null && update.message().replyToMessage().text().equals(VOLUNTEER_MESSAGE)) {
                         //если сообщение пришло в ответ на кнопку "позвать волонтера" с любым текстом
                         botCommandService.sendMessageToVolunteer(chatId, text);
                     }
