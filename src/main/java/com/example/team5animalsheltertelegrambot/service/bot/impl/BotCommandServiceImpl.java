@@ -1,15 +1,21 @@
 package com.example.team5animalsheltertelegrambot.service.bot.impl;
 
 import com.example.team5animalsheltertelegrambot.configuration.CommandType;
+import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
 import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
+import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
 import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
+import com.example.team5animalsheltertelegrambot.service.report.AnimalReportService;
+import com.example.team5animalsheltertelegrambot.service.report.impl.AnimalReportServiceImpl;
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.PhotoSize;
+import com.pengrad.telegrambot.impl.FileApi;
+import com.pengrad.telegrambot.model.*;
+import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
@@ -20,25 +26,37 @@ import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.UUID;
 
 import static com.example.team5animalsheltertelegrambot.configuration.CommandType.*;
 import static com.example.team5animalsheltertelegrambot.service.ValidationRegularService.validateTelephone;
+import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.time.LocalDateTime.parse;
 
 @Service
 @RequiredArgsConstructor
 public class BotCommandServiceImpl implements BotCommandService {
+
+    @Value("${telegram.token}")
+    private String token;
     private final Logger logger = LoggerFactory.getLogger(BotCommandServiceImpl.class);
 
     private final TelegramBot telegramBot;
@@ -51,6 +69,28 @@ public class BotCommandServiceImpl implements BotCommandService {
     public static final String TELEPHONE = "Что бы мы могли с Вами связаться, напишите в чат ваш номер телефона.";
     public static final String PHONE_AGAIN = "Номер телефона не прошел проверку, пожалуйста, введите еще раз";
     public static final String VOLUNTEER_MESSAGE = "Что бы волонтер мог с Вами связаться, напишите в чат по какому вопросу вы обращаетесь.";
+
+    private static final String MESSAGE = """
+            (ID животного:)(\\s)(\\d+)(;)
+            (Рацион:)(\\s+)(\\W+)(;)
+            (Здоровье:)(\\s+)(\\W+)(;)
+            (Поведение:)(\\s+)(\\W+)(;)""";
+
+    private static final String exampleReport = """
+            ID животного: 1; 
+            Рацион: ваш текст;
+            Здоровье: ваш текст;
+            Поведение: ваш текст;""";
+
+    private static final String infoReport = """        
+            Для отчета нужна следующая информация:
+            Фото животного
+            Рацион
+            Общее самочувствие и привыкание к новому месту
+            Изменение в поведении: отказ от старых привычек, приобретение новых
+            Скопируйте следующий пример. Не забудьте прикрепить фото""";
+    @Autowired
+    private AnimalReportService animalReportService;
 
 
     @Override
@@ -148,45 +188,63 @@ public class BotCommandServiceImpl implements BotCommandService {
 
     }
 
+    /**
+     * Загрузка отчета
+     */
     @Override
-    public void runReport() {
-
+    public void runReport(Message message) {
+        Long chatId = message.chat().id();
+        SendMessage sendMessage = new SendMessage(chatId, infoReport);
+        telegramBot.execute(sendMessage);
+        SendMessage sendMessage1 = new SendMessage(chatId, exampleReport);
+        telegramBot.execute(sendMessage1);
     }
 
-    /**
-     * Загрузка фото
-     */
-    public void getPhoto(Message message) {
-        PhotoSize photoSize = message.photo()[message.photo().length - 1];
-        GetFileResponse getFileResponse = telegramBot.execute(new GetFile(photoSize.fileId()));
-        if (getFileResponse.isOk()) {
+    @Override
+    public void saveText(Update update) {
+        Message message = update.message();
+        Long chatId = message.chat().id();
+        String text = message.caption();
+
+        Pattern pattern = Pattern.compile(MESSAGE);
+        Matcher matcher = pattern.matcher(text);
+
+        if (matcher.matches()) {
+            int id = Integer.parseInt(matcher.group(3));
+            String diet = matcher.group(7);
+            String wellBeing = matcher.group(11);
+            String behavior = matcher.group(15);
+
+            GetFile getFileRequest = new GetFile(update.message().photo()[1].fileId());
+            GetFileResponse getFileResponse = telegramBot.execute(getFileRequest);
             try {
-                String extension = StringUtils.getFilenameExtension(
-                        getFileResponse.file().filePath());
-                byte[] photo = telegramBot.getFileContent(getFileResponse.file());
-                Files.write(Paths.get(UUID.randomUUID() + "." + extension), photo);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                File file = getFileResponse.file();
+                file.fileSize();
+                String fullPathPhoto = file.filePath();
+                LocalDateTime dateTime = LocalDateTime.now();
+
+                Customer customer = customerRepository.findByChatId(chatId).orElseThrow();
+                Animal animal = new Animal();
+
+                animal.setId(id);
+                AnimalReport animalReport = new AnimalReport();
+
+                animalReport.setPhoto(fullPathPhoto);
+                animalReport.setDiet(diet);
+                animalReport.setWellBeing(wellBeing);
+                animalReport.setBehavior(behavior);
+                animalReport.setDateCreate(dateTime);
+                animalReport.setAnimal(animal);
+                animalReport.setCustomer(customer);
+                System.out.println(animalReport);
+                animalReportService.save(animalReport);
+                telegramBot.execute(new SendMessage(message.chat().id(), "Отчет успешно принят!"));
+            } catch (Exception e) {
+                telegramBot.execute(new SendMessage(message.chat().id(), "Загрузка не удалась!"));
             }
         }
     }
 
-    /**
-     * Метод для получения текста!
-     */
-    public void getMassage(Message message) {
-        String text = message.text();
-        GetFileResponse getFileResponse = telegramBot.execute(new GetFile(text));
-        if (getFileResponse.isOk()) {
-            String extension = StringUtils.getFilenameExtension(getFileResponse.file().filePath());
-            try {
-                String txt = telegramBot.getFullFilePath(getFileResponse.file());
-                Files.write(Paths.get(UUID.randomUUID() + "." + extension), txt.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     /**
      * Обработка нажатия кнопки "позвать Волонтера". Запрос на сообщение для волонтеров
@@ -211,8 +269,8 @@ public class BotCommandServiceImpl implements BotCommandService {
         SendMessage sendMessage = new SendMessage(chatId, TELEPHONE);
         sendMessage.replyMarkup(new ForceReply()); // новый диалог
         telegramBot.execute(sendMessage);
-
     }
+
 
     @Override
     public void saveTelephone(long chatId, String phone) {
