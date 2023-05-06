@@ -1,26 +1,25 @@
 package com.example.team5animalsheltertelegrambot.service.bot.impl;
 
-import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
 import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
-import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
 import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.example.team5animalsheltertelegrambot.service.report.AnimalReportService;
-import com.example.team5animalsheltertelegrambot.service.report.impl.AnimalReportServiceImpl;
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.impl.FileApi;
-import com.pengrad.telegrambot.model.*;
 import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
-import com.pengrad.telegrambot.request.*;
+import com.pengrad.telegrambot.request.GetFile;
+import com.pengrad.telegrambot.request.SendDocument;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,27 +28,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
-
-import java.io.*;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.UUID;
 
 import static com.example.team5animalsheltertelegrambot.configuration.CommandType.*;
 import static com.example.team5animalsheltertelegrambot.service.ValidationRegularService.validateTelephone;
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-import static java.time.LocalDateTime.parse;
 
 @Service
 @RequiredArgsConstructor
@@ -201,8 +192,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
-    public void saveText(Update update) {
-        Message message = update.message();
+    public void saveText(Message message) {
         Long chatId = message.chat().id();
         String text = message.caption();
 
@@ -215,7 +205,7 @@ public class BotCommandServiceImpl implements BotCommandService {
             String wellBeing = matcher.group(11);
             String behavior = matcher.group(15);
 
-            GetFile getFileRequest = new GetFile(update.message().photo()[1].fileId());
+            GetFile getFileRequest = new GetFile(message.photo()[1].fileId());
             GetFileResponse getFileResponse = telegramBot.execute(getFileRequest);
             try {
                 File file = getFileResponse.file();
