@@ -138,4 +138,16 @@ objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
                                  constraintName="FK_ANISHEEMP_ON_EMPLOYEE" referencedColumnNames="ID"
                                  referencedTableName="PERSON"/>
     </changeSet>
+    <changeSet id="15" author="team5animalsheltertelegrambot">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="DESCRIPTION" value="Это самый крутой приют самых крутых собак!"/>
+            <where>dtype='DSH'</where>
+        </update>
+    </changeSet>
+    <changeSet id="16" author="team5animalsheltertelegrambot">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="DESCRIPTION" value="Это самый крутой приют самых крутых кошек!"/>
+            <where>dtype='KSH'</where>
+        </update>
+    </changeSet>
 </databaseChangeLog>

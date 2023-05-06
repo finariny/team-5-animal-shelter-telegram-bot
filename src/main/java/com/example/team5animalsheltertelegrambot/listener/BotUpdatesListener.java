@@ -99,6 +99,7 @@ public class BotUpdatesListener implements UpdatesListener {
                 case PHONE -> botCommandService.runTelephone(chatId);
                 case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                 case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
+                case SHELTER -> botCommandService.runShelter(chatId, animalShelter);
                 case VOLUNTEER -> {
                     if (customer.getPhone() != null) {
                         botCommandService.runVolunteer(chatId);
@@ -180,6 +181,7 @@ public class BotUpdatesListener implements UpdatesListener {
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                     case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                     case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
+                    case SHELTER -> botCommandService.runShelter(chatId, animalShelter);
                 }
             }
         } catch (Exception e) {
