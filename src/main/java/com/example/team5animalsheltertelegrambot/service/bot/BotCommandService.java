@@ -56,7 +56,7 @@ public interface BotCommandService {
      */
     void runReport();
 
-    void saveText(Update update);
+    void saveText(Message message);
     /**
      * Вызывает волонтера
      *
