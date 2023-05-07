@@ -24,7 +24,7 @@ public interface BotCommandService {
     /**
      * Выводит информацию о том, как взять животное из приюта
      */
-    void runAdopt();
+    void runAdopt(Long chatId, AnimalShelter shelter);
 
     /**
      * Выводит клавиатуру с командами для работы с приютом для кошек
@@ -49,17 +49,35 @@ public interface BotCommandService {
 
     /**
      * Выводит клавиатуру с командами для запроса "Узнать информацию о приюте"
-     * @param chatId идентификатор чата Телеграм
+     *
+     * @param chatId  идентификатор чата Телеграм
      * @param shelter приют для животных
      */
-    void runInfo(Long chatId,AnimalShelter  shelter);
+    void runInfo(Long chatId, AnimalShelter shelter);
 
     /**
      * Выводит информацию о приюте
-     * @param chatId идентификатор чата Телеграм
+     *
+     * @param chatId  идентификатор чата Телеграм
      * @param shelter приют для животных
      */
     void runShelter(Long chatId, AnimalShelter shelter);
+
+    /**
+     * Выводит контактные данные охраны для оформления пропуска на машину
+     *
+     * @param chatId  идентификатор чата Телеграм
+     * @param shelter приют для животных
+     */
+    void runSecurity(Long chatId, AnimalShelter shelter);
+
+    /**
+     * Выводит общие рекомендации о технике безопасности на территории приюта
+     *
+     * @param chatId  идентификатор чата Телеграм
+     * @param shelter приют для животных
+     */
+    void runSafety(Long chatId, AnimalShelter shelter);
 
     /**
      * Запускает интерфейс для отчета
@@ -81,9 +99,7 @@ public interface BotCommandService {
 
     void sendMessageToVolunteer(Long chatId, String text);
 
-    void runContact(Long chatId, AnimalShelter  shelter);
-
-    void runAdvice(Long chatId, AnimalShelter  shelter);
+    void runContact(Long chatId, AnimalShelter shelter);
 
     void runLocation(Long chatId, AnimalShelter shelter);
 

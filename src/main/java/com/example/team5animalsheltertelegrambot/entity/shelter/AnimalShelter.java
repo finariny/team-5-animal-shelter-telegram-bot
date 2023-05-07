@@ -41,6 +41,12 @@ public class AnimalShelter extends NamedEntity {
     @Column(name = "IMAGE_NAME")
     private String imageName;
 
+    @Column(name = "SECURITY_CONTACT")
+    private String securityContact;
+
+    @Column(name = "SHELTER_SAFETY_ADVICE")
+    private String shelterSafetyAdvice;
+
 
     @JoinTable(name = "ANIMAL_SHELTER_CUSTOMER_LINK",
             joinColumns = @JoinColumn(name = "ANIMAL_SHELTER_ID"),
@@ -129,6 +135,22 @@ public class AnimalShelter extends NamedEntity {
             throw new ValidationException(description);
         }
         this.description = description;
+    }
+
+    public String getSecurityContact() {
+        return securityContact;
+    }
+
+    public void setSecurityContact(String securityContact) {
+        this.securityContact = securityContact;
+    }
+
+    public String getShelterSafetyAdvice() {
+        return shelterSafetyAdvice;
+    }
+
+    public void setShelterSafetyAdvice(String shelterSafetyAdvice) {
+        this.shelterSafetyAdvice = shelterSafetyAdvice;
     }
 
     public List<Customer> getCustomers() {
