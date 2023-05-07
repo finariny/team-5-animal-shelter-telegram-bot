@@ -94,12 +94,14 @@ public class BotUpdatesListener implements UpdatesListener {
                     animalShelter = dogShelterRepository.findById(1).orElse(null);
                     botCommandService.runDogs(chatId, animalShelter);
                 }
+                case ADOPT -> botCommandService.runAdopt(chatId, animalShelter);
                 case INFO -> botCommandService.runInfo(chatId, animalShelter);
                 case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                 case PHONE -> botCommandService.runTelephone(chatId);
-                case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                 case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
                 case SHELTER -> botCommandService.runShelter(chatId, animalShelter);
+                case SECURITY -> botCommandService.runSecurity(chatId, animalShelter);
+                case SAFETY -> botCommandService.runSafety(chatId, animalShelter);
                 case VOLUNTEER -> {
                     if (customer.getPhone() != null) {
                         botCommandService.runVolunteer(chatId);
@@ -160,7 +162,7 @@ public class BotUpdatesListener implements UpdatesListener {
             } else {
                 switch (commandType) {
                     case ABOUT -> botCommandService.runAbout(customer);
-                    case ADOPT -> botCommandService.runAdopt();
+                    case ADOPT -> botCommandService.runAdopt(chatId, animalShelter);
                     case CATS -> {
                         animalShelter = catShelterRepository.findById(2).orElse(null);
                         botCommandService.runCats(chatId, animalShelter);
@@ -179,9 +181,10 @@ public class BotUpdatesListener implements UpdatesListener {
                     case REPORT -> botCommandService.runReport(message);
                     case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
-                    case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                     case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
                     case SHELTER -> botCommandService.runShelter(chatId, animalShelter);
+                    case SECURITY -> botCommandService.runSecurity(chatId, animalShelter);
+                    case SAFETY -> botCommandService.runSafety(chatId, animalShelter);
                 }
             }
         } catch (Exception e) {

@@ -36,4 +36,53 @@ objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
         </insert>
     </changeSet>
 
+    <changeSet id="3" author="team5animalsheltertelegrambot-update">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="DESCRIPTION" value="Это самый крутой приют самых крутых собак!"/>
+            <where>dtype='DSH'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="4" author="team5animalsheltertelegrambot-update">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="DESCRIPTION" value="Это самый крутой приют самых крутых кошек!"/>
+            <where>dtype='KSH'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="5" author="team5animalsheltertelegrambot-update">
+        <addColumn catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="SECURITY_CONTACT" type="VARCHAR(255)"/>
+            <column name="SHELTER_SAFETY_ADVICE" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="6" author="team5animalsheltertelegrambot-update">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="SECURITY_CONTACT" value="Кузнецов Сергей Анатольевич, тел.: +79618195652"/>
+            <where>dtype='DSH'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="7" author="team5animalsheltertelegrambot-update">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="SECURITY_CONTACT" value="Головков Александр Владимирович, тел.: +79618236917"/>
+            <where>dtype='KSH'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="8" author="team5animalsheltertelegrambot-update">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="SHELTER_SAFETY_ADVICE" value="SafetyAdviceDogShelter.pdf"/>
+            <where>dtype='DSH'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="9" author="team5animalsheltertelegrambot-update">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="SHELTER_SAFETY_ADVICE" value="SafetyAdviceCatShelter.pdf"/>
+            <where>dtype='KSH'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>
