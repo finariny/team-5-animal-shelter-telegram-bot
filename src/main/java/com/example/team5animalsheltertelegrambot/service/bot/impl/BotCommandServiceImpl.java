@@ -5,6 +5,7 @@ import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.exception.ReportException;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
 import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
 import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
@@ -68,13 +69,14 @@ public class BotCommandServiceImpl implements BotCommandService {
     //Константы сообщений для проверки reply сообщений с телефоном
     public static final String TELEPHONE = "Что бы мы могли с Вами связаться, напишите в чат ваш номер телефона.";
     public static final String PHONE_AGAIN = "Номер телефона не прошел проверку, пожалуйста, введите еще раз";
-    public static final String VOLUNTEER_MESSAGE = "Что бы волонтер мог с Вами связаться, напишите в чат по какому вопросу вы обращаетесь.";
+
+    public static final String VOLUNTEER_MESSAGE = "Чтобы волонтер мог с вами связаться, напишите в чат по какому вопросу вы обращаетесь.";
 
     private static final String MESSAGE = """
             (ID животного:)(\\s)(\\d+)(;)
-            (Рацион:)(\\s+)(\\W+)(;)
-            (Здоровье:)(\\s+)(\\W+)(;)
-            (Поведение:)(\\s+)(\\W+)(;)""";
+            (Рацион:)(\\s+)([А-я\\d\\s.,!?:]+)(;)
+            (Здоровье:)(\\s+)([А-я\\d\\s.,!?:]+)(;)
+            (Поведение:)(\\s+)([А-я\\d\\s.,!?:]+)(;)""";
 
     private static final String exampleReport = """
             ID животного: 1; 
@@ -100,6 +102,7 @@ public class BotCommandServiceImpl implements BotCommandService {
                         Вас приветствует _*бот*_, который поможет сделать доброе дело\\.""",
                 customer.getLastName(),
                 customer.getFirstName());
+
         sendMessage(customer.getChatId(), welcomeMessage);
     }
 
@@ -111,7 +114,6 @@ public class BotCommandServiceImpl implements BotCommandService {
     /**
      * Вывод первого меню с кнопками выбора приюта кошек или собак
      */
-
     @Override
     public void runStart(Long chatId) {
         // Кнопки выбора приюта
@@ -189,7 +191,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     /**
-     * Загрузка отчета
+     * Информационное меню для отправки отчета
      */
     @Override
     public void runReport(Message message) {
@@ -200,8 +202,11 @@ public class BotCommandServiceImpl implements BotCommandService {
         telegramBot.execute(sendMessage1);
     }
 
+    /**
+     * Метод для сохранения отчета
+     */
     @Override
-    public void saveText(Update update) {
+    public void saveReport(Update update) {
         Message message = update.message();
         Long chatId = message.chat().id();
         String text = message.caption();
@@ -240,8 +245,10 @@ public class BotCommandServiceImpl implements BotCommandService {
                 animalReportService.save(animalReport);
                 telegramBot.execute(new SendMessage(message.chat().id(), "Отчет успешно принят!"));
             } catch (Exception e) {
-                telegramBot.execute(new SendMessage(message.chat().id(), "Загрузка не удалась!"));
+                telegramBot.execute(new SendMessage(message.chat().id(), "Загрузка не удалась! Проверьте корректность введенных данных"));
             }
+        } else {
+            throw new ReportException();
         }
     }
 
@@ -253,7 +260,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     public void runVolunteer(Long chatId) {
         System.out.println("после нажатия кнопки Волонтер");
         //Отправка сообщения в чат с ботом
-        String customerMessage = VOLUNTEER_MESSAGE;
+        String customerMessage = "Что бы волонтер мог с Вами связаться, напишите в чат по какому вопросу вы обращаетесь.";
         SendMessage sendMessage = new SendMessage(chatId, customerMessage);
         sendMessage.replyMarkup(new ForceReply());
         telegramBot.execute(sendMessage);
