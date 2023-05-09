@@ -150,7 +150,7 @@ public class BotUpdatesListener implements UpdatesListener {
 
             // ловим сообщения с фото
             if (message.photo() != null && message.caption() != null) {
-                botCommandService.saveText(message);
+                botCommandService.saveReport(message);
                 return;
             }
 

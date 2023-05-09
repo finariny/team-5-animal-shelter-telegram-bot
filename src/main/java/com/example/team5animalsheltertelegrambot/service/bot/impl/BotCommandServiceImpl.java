@@ -4,6 +4,7 @@ import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.exception.ReportException;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
 import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
 import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
@@ -12,6 +13,7 @@ import com.example.team5animalsheltertelegrambot.service.report.AnimalReportServ
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.File;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
@@ -68,7 +70,7 @@ public class BotCommandServiceImpl implements BotCommandService {
             (Поведение:)(\\s+)([А-я\\d\\s.,!?:]+)(;)""";
 
     private static final String exampleReport = """
-            ID животного: ; 
+            ID животного: 1; 
             Рацион: ваш текст;
             Здоровье: ваш текст;
             Поведение: ваш текст;""";
@@ -246,9 +248,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
-    public void saveReport(Update update) {
-        Message message = update.message();
-    public void saveText(Message message) {
+    public void saveReport(Message message) {
         Long chatId = message.chat().id();
         String text = message.caption();
 
@@ -282,12 +282,16 @@ public class BotCommandServiceImpl implements BotCommandService {
                 animalReport.setDateCreate(dateTime);
                 animalReport.setAnimal(animal);
                 animalReport.setCustomer(customer);
-                System.out.println(animalReport);
+
                 animalReportService.save(animalReport);
+
                 telegramBot.execute(new SendMessage(message.chat().id(), "Отчет успешно принят!"));
             } catch (Exception e) {
-                telegramBot.execute(new SendMessage(message.chat().id(), "Загрузка не удалась!"));
+                telegramBot.execute(new SendMessage(
+                         message.chat().id(), "Загрузка не удалась! Проверьте введенные данные!"));
             }
+        } else {
+            throw new ReportException();
         }
     }
 
