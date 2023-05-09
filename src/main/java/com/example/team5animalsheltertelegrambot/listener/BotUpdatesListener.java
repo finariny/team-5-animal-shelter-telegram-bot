@@ -4,8 +4,8 @@ import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.example.team5animalsheltertelegrambot.repository.CatShelterRepository;
-import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.repository.DogShelterRepository;
+import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -62,33 +62,11 @@ public class BotUpdatesListener implements UpdatesListener {
     public int process(List<Update> updates) {
         updates.forEach(update -> {
             logger.info("Обработка обновления: {}", update);
-            if (update.message() != null) { //проверка на пустой апдейт
-                Long chatId = update.message().chat().id();
-                if (update.message().text() != null) { //проверка на наличие текста в сообщении
-                    String text = update.message().text();
-                    //Далее проверки - если сообщение пришло в ответ на сообщение бота
-                    if (update.message().replyToMessage() != null && update.message().replyToMessage().text().equals(TELEPHONE)||
-                            update.message().replyToMessage() != null && update.message().replyToMessage().text().equals(PHONE_AGAIN)
-                    ) {
-                        //если сообщение пришло в ответ на кнопку "Телефон"
-                        botCommandService.saveTelephone(chatId, text);
-                    }
-                    else if (update.message().replyToMessage() != null && update.message().replyToMessage().text().equals(VOLUNTEER_MESSAGE)) {
-                        //если сообщение пришло в ответ на кнопку "позвать волонтера" с любым текстом
-                        botCommandService.sendMessageToVolunteer(chatId, text);
-                    }
-                }
-                handleMessage(update.message());
-            }
             if (update.callbackQuery() != null) {
                 handleCallback(update.callbackQuery());
             }
             if (update.message() != null) {
-
                 handleMessage(update.message());
-                if (update.message().photo() != null && update.message().caption() != null) {
-                    botCommandService.saveText(update);
-                }
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
@@ -116,11 +94,14 @@ public class BotUpdatesListener implements UpdatesListener {
                     animalShelter = dogShelterRepository.findById(1).orElse(null);
                     botCommandService.runDogs(chatId, animalShelter);
                 }
+                case ADOPT -> botCommandService.runAdopt(chatId, animalShelter);
                 case INFO -> botCommandService.runInfo(chatId, animalShelter);
                 case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                 case PHONE -> botCommandService.runTelephone(chatId);
-                case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                 case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
+                case SHELTER -> botCommandService.runShelter(chatId, animalShelter);
+                case SECURITY -> botCommandService.runSecurity(chatId, animalShelter);
+                case SAFETY -> botCommandService.runSafety(chatId, animalShelter);
                 case VOLUNTEER -> {
                     if (customer.getPhone() != null) {
                         botCommandService.runVolunteer(chatId);
@@ -146,11 +127,12 @@ public class BotUpdatesListener implements UpdatesListener {
      */
     private void handleMessage(Message message) {
 
-        boolean isNewCustomer = false;
+        boolean isNewCustomer = false; // флаг нового пользователя
         try {
             Long chatId = message.from().id();
             Customer customer;
 
+            // ищем пользователя в базе, если нет - сохраняем
             if (customerRepository.existsByChatId(chatId)) {
                 customer = customerRepository.findByChatId(chatId).orElseThrow();
             } else {
@@ -160,6 +142,19 @@ public class BotUpdatesListener implements UpdatesListener {
                 );
             }
 
+            // если сообщение пришло в ответ на сообщение бота, то обрабатываем в другом методе
+            if (message.replyToMessage() != null) {
+                handleReplyToMessage(message);
+                return;
+            }
+
+            // ловим сообщения с фото
+            if (message.photo() != null && message.caption() != null) {
+                botCommandService.saveText(message);
+                return;
+            }
+
+            // если это отдельное сообщение, то сверяем со списком команд из CommandType и запускаем выполнение при совпадении
             String command = message.text();
             CommandType commandType = CommandType.fromCommand(command);
             if (commandType == null) {
@@ -167,7 +162,7 @@ public class BotUpdatesListener implements UpdatesListener {
             } else {
                 switch (commandType) {
                     case ABOUT -> botCommandService.runAbout(customer);
-                    case ADOPT -> botCommandService.runAdopt();
+                    case ADOPT -> botCommandService.runAdopt(chatId, animalShelter);
                     case CATS -> {
                         animalShelter = catShelterRepository.findById(2).orElse(null);
                         botCommandService.runCats(chatId, animalShelter);
@@ -186,12 +181,24 @@ public class BotUpdatesListener implements UpdatesListener {
                     case REPORT -> botCommandService.runReport(message);
                     case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
-                    case ADVICE -> botCommandService.runAdvice(chatId, animalShelter);
                     case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
+                    case SHELTER -> botCommandService.runShelter(chatId, animalShelter);
+                    case SECURITY -> botCommandService.runSecurity(chatId, animalShelter);
+                    case SAFETY -> botCommandService.runSafety(chatId, animalShelter);
                 }
             }
         } catch (Exception e) {
             logger.error("Ошибка при обработке сообщения: {}", e.getMessage());
+        }
+    }
+
+    private void handleReplyToMessage(Message message) {
+        if (message.replyToMessage().text().equals(TELEPHONE) || message.replyToMessage().text().equals(PHONE_AGAIN)) {
+            //если сообщение пришло в ответ на кнопку "Телефон"
+            botCommandService.saveTelephone(message.chat().id(), message.text());
+        } else if (message.replyToMessage().text().equals(VOLUNTEER_MESSAGE)) {
+            //если сообщение пришло в ответ на кнопку "позвать волонтера" с любым текстом
+            botCommandService.sendMessageToVolunteer(message.chat().id(), message.text());
         }
     }
 }
