@@ -62,16 +62,16 @@ public class BotCommandServiceImpl implements BotCommandService {
     public static final String VOLUNTEER_MESSAGE = "Пожалуйста, напишите в чат по какому вопросу Вы обращаетесь.";
 
     private static final String MESSAGE = """
-            (1\\. ID животного:)(\\s)(\\d+)(;)
-            (2\\. Рацион:)(\\s+)(\\W+)(;)
-            (3\\. Здоровье:)(\\s+)(\\W+)(;)
-            (4\\. Поведение:)(\\s+)(\\W+)(\\.)""";
+            (ID животного:)(\\s)(\\d+)(;)
+            (Рацион:)(\\s+)([А-я\\d\\s.,!?:]+)(;)
+            (Здоровье:)(\\s+)([А-я\\d\\s.,!?:]+)(;)
+            (Поведение:)(\\s+)([А-я\\d\\s.,!?:]+)(;)""";
 
     private static final String exampleReport = """
-            1. ID животного: числовой ID питомца;
-            2. Рацион: Ваш текст;
-            3. Здоровье: Ваш текст;
-            4. Поведение: Ваш текст.""";
+            ID животного: ; 
+            Рацион: ваш текст;
+            Здоровье: ваш текст;
+            Поведение: ваш текст;""";
 
     private static final String infoReport = """        
             Для отчета нужна следующая информация:
@@ -91,6 +91,7 @@ public class BotCommandServiceImpl implements BotCommandService {
                         Вас приветствует _*бот*_, который поможет сделать доброе дело\\.""",
                 customer.getLastName(),
                 customer.getFirstName());
+
         sendMessage(customer.getChatId(), welcomeMessage);
     }
 
@@ -233,7 +234,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     /**
-     * Загрузка отчета
+     * Информационное меню для отправки отчета
      */
     @Override
     public void runReport(Message message) {
@@ -245,6 +246,8 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
+    public void saveReport(Update update) {
+        Message message = update.message();
     public void saveText(Message message) {
         Long chatId = message.chat().id();
         String text = message.caption();
@@ -287,6 +290,7 @@ public class BotCommandServiceImpl implements BotCommandService {
             }
         }
     }
+
 
     /**
      * Обработка нажатия кнопки "позвать Волонтера". Запрос на сообщение для волонтеров
