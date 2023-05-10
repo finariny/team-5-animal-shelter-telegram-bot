@@ -85,4 +85,18 @@ objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
         </update>
     </changeSet>
 
+    <changeSet id="10" author="team5animalsheltertelegrambot-update">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="NAME" value="Кошкин дом"/>
+            <where>dtype='KSH'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="11" author="team5animalsheltertelegrambot-update">
+        <update catalogName="AST" schemaName="PUBLIC" tableName="ANIMAL_SHELTER">
+            <column name="NAME" value="Верный друг"/>
+            <where>dtype='DSH'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

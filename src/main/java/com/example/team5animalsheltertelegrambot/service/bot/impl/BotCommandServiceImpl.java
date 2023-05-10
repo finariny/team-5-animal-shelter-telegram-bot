@@ -210,8 +210,9 @@ public class BotCommandServiceImpl implements BotCommandService {
     @Override
     public void runSecurity(Long chatId, AnimalShelter shelter) {
         String message = String.format("""
-                        <b>Контактные данные охраны:</b>
+                        <b>Контактные данные охраны приюта "%s":</b>
                         %s""",
+                shelter.getName(),
                 shelter.getSecurityContact());
         SendMessage sendMessage = new SendMessage(chatId, message);
         sendMessage.parseMode(ParseMode.HTML);
@@ -227,8 +228,9 @@ public class BotCommandServiceImpl implements BotCommandService {
             SendDocument sendDocument = new SendDocument(chatId, pdf).fileName(shelter.getShelterSafetyAdvice());
 
             sendDocument.caption(
-                    "Общие рекомендации о технике безопасности от приюта " + shelter.getName() + "!"
+                    "Общие рекомендации о технике безопасности в приюте <b>\"" + shelter.getName() + "\"</b>!"
             );
+            sendDocument.parseMode(ParseMode.HTML);
             telegramBot.execute(sendDocument);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
@@ -288,7 +290,7 @@ public class BotCommandServiceImpl implements BotCommandService {
                 telegramBot.execute(new SendMessage(message.chat().id(), "Отчет успешно принят!"));
             } catch (Exception e) {
                 telegramBot.execute(new SendMessage(
-                         message.chat().id(), "Загрузка не удалась! Проверьте введенные данные!"));
+                        message.chat().id(), "Загрузка не удалась! Проверьте введенные данные!"));
             }
         } else {
             throw new ReportException();
