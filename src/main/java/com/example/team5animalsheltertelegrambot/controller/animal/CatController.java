@@ -1,6 +1,8 @@
 package com.example.team5animalsheltertelegrambot.controller.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Cat;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.animal.CatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -9,10 +11,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
@@ -33,9 +38,11 @@ import java.util.List;
 public class CatController {
 
     private final CatService catService;
+    private final CustomerRepository customerRepository;
 
-    public CatController(CatService catService) {
+    public CatController(CatService catService, CustomerRepository customerRepository) {
         this.catService = catService;
+        this.customerRepository = customerRepository;
     }
 
     @Operation(
@@ -203,5 +210,22 @@ public class CatController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @Operation(summary = "Регистрация усыновления кошки")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Усыновление зарегистрировано"),
+            @ApiResponse(responseCode = "400", description = "Параметры запроса отсутствуют или имеют некорректный формат")})
+    @PutMapping("/adopt")
+    public ResponseEntity<Boolean> adopt(
+            @RequestParam @Positive Integer catId,
+            @RequestParam @Positive Integer customerId) {
+        try {
+            Cat cat = catService.findById(catId).orElseThrow();
+            Customer customer = customerRepository.findById(customerId).orElseThrow();
+            return ResponseEntity.ok(catService.adopt(cat, customer));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка регистрации:" + e.getMessage());
+        }
     }
 }

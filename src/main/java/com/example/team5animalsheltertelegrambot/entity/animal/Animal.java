@@ -1,9 +1,11 @@
 package com.example.team5animalsheltertelegrambot.entity.animal;
 
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -24,6 +26,13 @@ public class Animal extends NamedEntity {
 
     @Column(name = "IS_VACCINATED")
     private Boolean isVaccinated;
+
+    @JoinColumn(name = "CUSTOMER_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Customer adopter;
+
+    @Column(name = "DATE_ADOPTION")
+    private LocalDateTime dateAdoption;
 
     @OneToMany(mappedBy = "animal")
     private List<AnimalReport> animalReports;
@@ -50,6 +59,22 @@ public class Animal extends NamedEntity {
 
     public void setVaccinated(Boolean vaccinated) {
         isVaccinated = vaccinated;
+    }
+
+    public Customer getAdopter() {
+        return adopter;
+    }
+
+    public void setAdopter(Customer adopter) {
+        this.adopter = adopter;
+    }
+
+    public LocalDateTime getDateAdoption() {
+        return dateAdoption;
+    }
+
+    public void setDateAdoption(LocalDateTime dateAdoption) {
+        this.dateAdoption = dateAdoption;
     }
 
     public List<AnimalReport> getAnimalReports() {
