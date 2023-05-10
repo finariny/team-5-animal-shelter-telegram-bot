@@ -3,6 +3,7 @@ package com.example.team5animalsheltertelegrambot.entity.animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
+import com.example.team5animalsheltertelegrambot.timer.ProbationType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,6 +34,9 @@ public class Animal extends NamedEntity {
 
     @Column(name = "DATE_ADOPTION")
     private LocalDateTime dateAdoption;
+
+    @Column(name = "PROBATION")
+    private Integer probation;
 
     @OneToMany(mappedBy = "animal")
     private List<AnimalReport> animalReports;
@@ -75,6 +79,14 @@ public class Animal extends NamedEntity {
 
     public void setDateAdoption(LocalDateTime dateAdoption) {
         this.dateAdoption = dateAdoption;
+    }
+
+    public ProbationType getProbation() {
+        return probation == null ? null : ProbationType.fromId(probation);
+    }
+
+    public void setProbation(ProbationType probation) {
+        this.probation = probation == null ? null : probation.getId();
     }
 
     public List<AnimalReport> getAnimalReports() {

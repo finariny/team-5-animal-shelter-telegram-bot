@@ -4,6 +4,7 @@ import com.example.team5animalsheltertelegrambot.entity.animal.Dog;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.animal.DogService;
+import com.example.team5animalsheltertelegrambot.timer.ProbationType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -219,11 +220,12 @@ public class DogController {
     @PutMapping("/adopt")
     public ResponseEntity<Boolean> adopt(
             @RequestParam @Positive Integer dogId,
-            @RequestParam @Positive Integer customerId) {
+            @RequestParam @Positive Integer customerId,
+            @RequestParam ProbationType probationType) {
         try {
             Dog dog = dogService.findById(dogId).orElseThrow();
             Customer customer = customerRepository.findById(customerId).orElseThrow();
-            return ResponseEntity.ok(dogService.adopt(dog, customer));
+            return ResponseEntity.ok(dogService.adopt(dog, customer, probationType));
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка регистрации:" + e.getMessage());
         }
