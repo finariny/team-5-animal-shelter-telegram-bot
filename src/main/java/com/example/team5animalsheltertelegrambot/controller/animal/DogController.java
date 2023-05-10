@@ -1,6 +1,8 @@
 package com.example.team5animalsheltertelegrambot.controller.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Dog;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.animal.DogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -9,10 +11,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
@@ -33,9 +38,11 @@ import java.util.List;
 public class DogController {
 
     private final DogService dogService;
+    private final CustomerRepository customerRepository;
 
-    public DogController(DogService dogService) {
+    public DogController(DogService dogService, CustomerRepository customerRepository) {
         this.dogService = dogService;
+        this.customerRepository = customerRepository;
     }
 
     @Operation(
@@ -203,5 +210,22 @@ public class DogController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @Operation(summary = "Регистрация усыновления собаки")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Усыновление зарегистрировано"),
+            @ApiResponse(responseCode = "400", description = "Параметры запроса отсутствуют или имеют некорректный формат")})
+    @PutMapping("/adopt")
+    public ResponseEntity<Boolean> adopt(
+            @RequestParam @Positive Integer dogId,
+            @RequestParam @Positive Integer customerId) {
+        try {
+            Dog dog = dogService.findById(dogId).orElseThrow();
+            Customer customer = customerRepository.findById(customerId).orElseThrow();
+            return ResponseEntity.ok(dogService.adopt(dog, customer));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка регистрации:" + e.getMessage());
+        }
     }
 }

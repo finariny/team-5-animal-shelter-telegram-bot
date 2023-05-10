@@ -1,10 +1,14 @@
 package com.example.team5animalsheltertelegrambot.service.animal;
 
+import com.example.team5animalsheltertelegrambot.entity.animal.Cat;
 import com.example.team5animalsheltertelegrambot.entity.animal.Dog;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.repository.animal.DogRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -133,5 +137,18 @@ public class DogService {
         }
         dogRepository.deleteById(id);
         return true;
+    }
+
+    /**
+     * Регистрирует усыновление собаки посетителем, добавляет текущую дату регистрации
+     *
+     * @param dog собака
+     * @param customer посетитель
+     * @return {@code true} - сущность обновлена, {@code false} - сущность не обновлена
+     */
+    public boolean adopt(@NotNull Dog dog, @NotNull Customer customer) {
+        dog.setAdopter(customer);
+        dog.setDateAdoption(LocalDateTime.now());
+        return this.save(dog);
     }
 }
