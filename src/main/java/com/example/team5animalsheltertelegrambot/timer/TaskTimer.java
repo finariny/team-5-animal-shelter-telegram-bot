@@ -3,10 +3,15 @@ package com.example.team5animalsheltertelegrambot.timer;
 import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.animal.Cat;
 import com.example.team5animalsheltertelegrambot.entity.animal.Dog;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
+import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
 import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
 import com.example.team5animalsheltertelegrambot.service.animal.CatService;
 import com.example.team5animalsheltertelegrambot.service.animal.DogService;
+import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
+import com.pengrad.telegrambot.TelegramBot;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class TaskTimer {
     private static final long DAYS_BEFORE_CUSTOMER_WARNING = 1L;
     private static final long DAYS_BEFORE_VOLUNTEER_WARNING = 2L;
@@ -21,14 +27,11 @@ public class TaskTimer {
     private final AnimalReportRepository animalReportRepository;
     private final CatService catService;
     private final DogService dogService;
+    private final BotCommandService botCommandService;
+    private final TelegramProperties telegramProperties;
+    private final TelegramBot telegramBot;
 
     private LocalDateTime currentDateTime;
-
-    public TaskTimer(AnimalReportRepository animalReportRepository, CatService catService, DogService dogService) {
-        this.animalReportRepository = animalReportRepository;
-        this.catService = catService;
-        this.dogService = dogService;
-    }
 
     /**
      * Задание, выполняемое по рассписанию
@@ -74,13 +77,19 @@ public class TaskTimer {
 
         // если первый дедлайн прохлопал, то предупреждение ему
         if (reportDeadline1.isAfter(firstAnimalReport.getDateCreate())) {
-            System.out.println(firstAnimalReport.getAnimal() + "Проспал дедлайн 1");
-            // TODO: 11.05.2023 отправка сообщения пользователю
+            Customer customer = animal.getAdopter();
+            String messageToUser = String.format("""
+                            *Уважаемый %s %s*\\!%n
+                            Вы забыли отправить ежедневный отчет об %s, поторопитесь\\!""",
+                    customer.getLastName(), customer.getFirstName(), animal.getName());
+            botCommandService.sendMessage(customer.getChatId(), messageToUser);
 
             // если и второй прохлопал, то еще и волонтеру
             if (reportDeadline2.isAfter(firstAnimalReport.getDateCreate())) {
-                System.out.println(firstAnimalReport.getAnimal() + "Проспал дедлайн 2");
-                // TODO: 11.05.2023 отправка сообщения волонтеру
+                String messageToVolunteer = String.format("""
+                                *Волонтер*,%n%s %s игнорирует отчеты об %s второй день\\!""",
+                        customer.getLastName(), customer.getFirstName(), animal.getName());
+                botCommandService.sendMessage(telegramProperties.volunteerChatId(), messageToVolunteer);
             }
         }
     }

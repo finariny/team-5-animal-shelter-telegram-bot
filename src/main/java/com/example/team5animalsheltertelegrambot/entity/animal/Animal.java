@@ -1,8 +1,8 @@
 package com.example.team5animalsheltertelegrambot.entity.animal;
 
+import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
-import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 import com.example.team5animalsheltertelegrambot.timer.ProbationType;
 
 import javax.persistence.*;
@@ -28,8 +28,8 @@ public class Animal extends NamedEntity {
     @Column(name = "IS_VACCINATED")
     private Boolean isVaccinated;
 
+    @ManyToOne
     @JoinColumn(name = "CUSTOMER_ID")
-    @ManyToOne(fetch = FetchType.LAZY)
     private Customer adopter;
 
     @Column(name = "DATE_ADOPTION")
@@ -100,8 +100,8 @@ public class Animal extends NamedEntity {
     @Override
     public String toString() {
         return "Имя: " + getName()
-                + ", возраст: " + age
-                + ", состояние здоровья: " + (isVaccinated ? "здоров(а)" : "не здоров(а)")
-                + ", наличие вакцинации: " + (isHealthy ? "вакцинирован(а)" : "не вакцинирован(а)");
+               + ", возраст: " + age
+               + ", состояние здоровья: " + (isVaccinated ? "здоров(а)" : "не здоров(а)")
+               + ", наличие вакцинации: " + (isHealthy ? "вакцинирован(а)" : "не вакцинирован(а)");
     }
 }
