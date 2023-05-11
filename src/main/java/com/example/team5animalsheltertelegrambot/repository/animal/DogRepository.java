@@ -62,4 +62,12 @@ public interface DogRepository extends JpaRepository<Dog, Integer> {
      */
     @Query(value = "SELECT d FROM Dog d WHERE d.isHealthy = :isHealthy AND d.isVaccinated = :isVaccinated")
     List<Dog> findAllByHealthAndVaccination(@Param("isHealthy") Boolean isHealthy, @Param("isVaccinated") Boolean isVaccinated);
+
+    /**
+     * Находит всех собак на испытательном сроке (которых усыновили)
+     *
+     * @param probationList Список вариантов испытательного срока в Integer
+     * @return Список всех собак на испытательном сроке (которых усыновили)
+     */
+    List<Dog> findByProbationIn(List<Integer> probationList);
 }

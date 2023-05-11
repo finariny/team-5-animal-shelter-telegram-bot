@@ -4,6 +4,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 
+/**
+ * Варианты испытательного срока в днях
+ * 0 - завершен успешно
+ */
 @Getter
 @RequiredArgsConstructor
 public enum ProbationType {

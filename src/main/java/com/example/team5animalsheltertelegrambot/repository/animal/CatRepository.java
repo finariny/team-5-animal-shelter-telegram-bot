@@ -62,4 +62,12 @@ public interface CatRepository extends JpaRepository<Cat, Integer> {
      */
     @Query(value = "SELECT c FROM Cat c WHERE c.isHealthy = :isHealthy AND c.isVaccinated = :isVaccinated")
     List<Cat> findAllByHealthAndVaccination(@Param("isHealthy") Boolean isHealthy, @Param("isVaccinated") Boolean isVaccinated);
+
+    /**
+     * Находит всех кошек на испытательном сроке (которых усыновили)
+     *
+     * @param probationList Список вариантов испытательного срока в Integer
+     * @return Список всех кошек на испытательном сроке (которых усыновили)
+     */
+    List<Cat> findByProbationIn(List<Integer> probationList);
 }

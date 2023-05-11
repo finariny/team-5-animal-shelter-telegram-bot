@@ -1,7 +1,6 @@
 package com.example.team5animalsheltertelegrambot.entity.report;
 
 import com.example.team5animalsheltertelegrambot.entity.BaseEntity;
-import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 
@@ -30,12 +29,12 @@ public class AnimalReport extends BaseEntity {
     @Column(name = "DATE_CREATE")
     private LocalDateTime dateCreate;
 
+    @ManyToOne
     @JoinColumn(name = "ANIMAL_ID")
-    @ManyToOne(fetch = FetchType.LAZY)
     private Animal animal;
 
+    @ManyToOne
     @JoinColumn(name = "CUSTOMER_ID")
-    @ManyToOne(fetch = FetchType.LAZY)
     private Customer customer;
 
     public AnimalReport(String photo,
