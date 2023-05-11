@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -152,5 +153,19 @@ public class DogService {
         dog.setDateAdoption(LocalDateTime.now());
         dog.setProbation(probationType);
         return this.save(dog);
+    }
+
+    /**
+     * Находит всех собак на испытательном сроке (которых усыновили)
+     *
+     * @param probationTypes Массив типов испытательного срока
+     * @return Список всех собак на испытательном сроке (которых усыновили)
+     */
+    public List<Dog> findOnProbation(ProbationType... probationTypes) {
+        List<Integer> integers = new ArrayList<>();
+        for (ProbationType probation : probationTypes) {
+            integers.add(probation.getId());
+        }
+        return dogRepository.findByProbationIn(integers);
     }
 }

@@ -4,7 +4,6 @@ import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
 
 import javax.validation.constraints.NotNull;
 

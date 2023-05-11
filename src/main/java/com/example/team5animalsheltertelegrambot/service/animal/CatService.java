@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -152,5 +153,19 @@ public class CatService {
         cat.setDateAdoption(LocalDateTime.now());
         cat.setProbation(probationType);
         return this.save(cat);
+    }
+
+    /**
+     * Находит всех кошек на испытательном сроке (которых усыновили)
+     *
+     * @param probationTypes Массив типов испытательного срока
+     * @return Список всех кошек на испытательном сроке (которых усыновили)
+     */
+    public List<Cat> findOnProbation(ProbationType... probationTypes) {
+        List<Integer> integers = new ArrayList<>();
+        for (ProbationType probation : probationTypes) {
+            integers.add(probation.getId());
+        }
+        return catRepository.findByProbationIn(integers);
     }
 }
