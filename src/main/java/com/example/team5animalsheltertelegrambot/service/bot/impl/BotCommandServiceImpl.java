@@ -70,7 +70,7 @@ public class BotCommandServiceImpl implements BotCommandService {
             (Поведение:)(\\s+)([А-я\\d\\s.,!?:]+)(;)""";
 
     private static final String exampleReport = """
-            ID животного: 1; 
+            ID животного: 1;
             Рацион: ваш текст;
             Здоровье: ваш текст;
             Поведение: ваш текст;""";
@@ -355,9 +355,6 @@ public class BotCommandServiceImpl implements BotCommandService {
         telegramBot.execute(sendVolunteerMessage);
     }
 
-    /**
-     * Отправка сообщения с контактами приюта
-     */
     @Override
     public void runContact(Long chatId, AnimalShelter shelter) {
         String message = "<i>Номер телефона приюта: </i><b>" + shelter.getContacts() + "</b>";
@@ -366,9 +363,6 @@ public class BotCommandServiceImpl implements BotCommandService {
         telegramBot.execute(sendMessage);
     }
 
-    /**
-     * Предоставление информации о локации приюта и схемы проезда к ней
-     */
     @Override
     public void runLocation(Long chatId, AnimalShelter shelter) {
         sendAddressAndWorkSchedule(chatId, shelter);
@@ -456,7 +450,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     /**
-     * Вспомогательный метод для отправки картинки при выборе приюта:
+     * Вспомогательный метод для отправки картинки при выборе приюта
      */
     private void sendPhotoShelter(Long chatId, AnimalShelter shelter) {
         try {
