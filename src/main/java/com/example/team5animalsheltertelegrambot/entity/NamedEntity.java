@@ -1,6 +1,6 @@
 package com.example.team5animalsheltertelegrambot.entity;
 
-import com.example.team5animalsheltertelegrambot.exceptions.ValidationException;
+import com.example.team5animalsheltertelegrambot.exception.ValidationException;
 import com.example.team5animalsheltertelegrambot.service.ValidationRegularService;
 
 import javax.persistence.Column;

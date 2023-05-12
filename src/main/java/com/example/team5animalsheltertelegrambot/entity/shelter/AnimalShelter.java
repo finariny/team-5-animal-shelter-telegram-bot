@@ -3,7 +3,7 @@ package com.example.team5animalsheltertelegrambot.entity.shelter;
 import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.person.Employee;
-import com.example.team5animalsheltertelegrambot.exceptions.ValidationException;
+import com.example.team5animalsheltertelegrambot.exception.ValidationException;
 import com.example.team5animalsheltertelegrambot.service.ValidationRegularService;
 
 import javax.persistence.*;

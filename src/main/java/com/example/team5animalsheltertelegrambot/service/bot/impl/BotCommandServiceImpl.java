@@ -4,6 +4,7 @@ import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.exception.MessageException;
 import com.example.team5animalsheltertelegrambot.exception.ReportException;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
 import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
@@ -411,7 +412,9 @@ public class BotCommandServiceImpl implements BotCommandService {
         sendMessage.parseMode(ParseMode.MarkdownV2);
         SendResponse sendResponse = telegramBot.execute(sendMessage);
         if (!sendResponse.isOk()) {
-            logger.error("Ошибка вывода сообщения: {}", sendResponse.description());
+            String msg = String.format("Ошибка вывода сообщения: %s", sendResponse.description());
+            logger.error(msg);
+            throw new MessageException(msg);
         }
     }
 
