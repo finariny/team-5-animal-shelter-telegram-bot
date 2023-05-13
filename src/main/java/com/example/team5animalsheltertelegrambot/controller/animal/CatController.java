@@ -86,7 +86,7 @@ public class CatController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Cat> findById(@PathVariable Integer id) {
+    public ResponseEntity<Cat> findById(@PathVariable int id) {
         return ResponseEntity.of(catService.findById(id));
     }
 
@@ -205,7 +205,7 @@ public class CatController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteById(@PathVariable Integer id) {
+    public ResponseEntity<Boolean> deleteById(@PathVariable int id) {
         boolean isCatDeleted = catService.deleteById(id);
         if (isCatDeleted) {
             return ResponseEntity.ok().build();

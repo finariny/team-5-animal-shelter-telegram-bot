@@ -51,7 +51,7 @@ public class CatService {
      * @param id идентификатор сущности
      * @return возвращаемая сущность
      */
-    public Optional<Cat> findById(Integer id) {
+    public Optional<Cat> findById(int id) {
         return catRepository.findById(id);
     }
 
@@ -131,9 +131,9 @@ public class CatService {
      * @param id идентификатор удаляемой сущности
      * @return {@code true} - сущность сохранена, {@code false} - сущность не сохранена
      */
-    public Boolean deleteById(Integer id) {
+    public Boolean deleteById(int id) {
         Optional<Cat> findCatById = findById(id);
-        if (id == null || findCatById.isEmpty()) {
+        if (findCatById.isEmpty()) {
             return false;
         }
         catRepository.deleteById(id);
