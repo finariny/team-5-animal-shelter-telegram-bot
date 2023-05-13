@@ -86,7 +86,7 @@ public class DogController {
             )
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Dog> findById(@PathVariable Integer id) {
+    public ResponseEntity<Dog> findById(@PathVariable int id) {
         return ResponseEntity.of(dogService.findById(id));
     }
 
@@ -205,7 +205,7 @@ public class DogController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteById(@PathVariable int id) {
         boolean isDogDeleted = dogService.deleteById(id);
         if (isDogDeleted) {
             return ResponseEntity.ok().build();

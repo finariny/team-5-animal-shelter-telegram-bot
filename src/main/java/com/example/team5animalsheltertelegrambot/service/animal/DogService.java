@@ -51,7 +51,7 @@ public class DogService {
      * @param id идентификатор сущности
      * @return возвращаемая сущность
      */
-    public Optional<Dog> findById(Integer id) {
+    public Optional<Dog> findById(int id) {
         return dogRepository.findById(id);
     }
 
@@ -131,9 +131,9 @@ public class DogService {
      * @param id идентификатор удаляемой сущности
      * @return {@code true} - сущность сохранена, {@code false} - сущность не сохранена
      */
-    public Boolean deleteById(Integer id) {
+    public Boolean deleteById(int id) {
         Optional<Dog> findDogById = findById(id);
-        if (id == null || findDogById.isEmpty()) {
+        if (findDogById.isEmpty()) {
             return false;
         }
         dogRepository.deleteById(id);
