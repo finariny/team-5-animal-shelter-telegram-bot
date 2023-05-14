@@ -39,7 +39,6 @@ public class DogShelterController {
 
     private final DogShelterRepository dogShelterRepository;
 
-
     @PostConstruct
     public void findShelter() {
         dogShelterRepository.findById(1).orElse(null); // приют собак под индексом 1
