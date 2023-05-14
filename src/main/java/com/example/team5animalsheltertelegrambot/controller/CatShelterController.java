@@ -43,11 +43,10 @@ import java.util.List;
 public class CatShelterController {
 
     private final CatShelterRepository catShelterRepository;
-    CatShelter catShelter;
 
     @PostConstruct
     public void findShelter() {
-        catShelter = catShelterRepository.findById(2).orElse(null);// приют кошек под индексом 2
+        catShelterRepository.findById(2).orElse(null);// приют кошек под индексом 2
     }
 
     @Operation(summary = "Добавление приюта")

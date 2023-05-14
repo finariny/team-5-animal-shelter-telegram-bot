@@ -38,11 +38,11 @@ import java.util.List;
 public class DogShelterController {
 
     private final DogShelterRepository dogShelterRepository;
-    DogShelter dogShelter;
+
 
     @PostConstruct
     public void findShelter() {
-        dogShelter = dogShelterRepository.findById(1).orElse(null); // приют собак под индексом 1
+        dogShelterRepository.findById(1).orElse(null); // приют собак под индексом 1
     }
 
     @Operation(summary = "Добавление приюта собак")
