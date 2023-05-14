@@ -41,7 +41,7 @@ public class BotUpdatesListener implements UpdatesListener {
 
     private final DogShelterRepository dogShelterRepository;
 
-    AnimalShelter animalShelter = null;
+    private AnimalShelter animalShelter;
 
     @PostConstruct
     public void init() {
