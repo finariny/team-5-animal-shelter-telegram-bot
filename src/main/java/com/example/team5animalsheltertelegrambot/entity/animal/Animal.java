@@ -1,9 +1,12 @@
 package com.example.team5animalsheltertelegrambot.entity.animal;
 
-import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.NamedEntity;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
+import com.example.team5animalsheltertelegrambot.timer.ProbationType;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -24,6 +27,16 @@ public class Animal extends NamedEntity {
 
     @Column(name = "IS_VACCINATED")
     private Boolean isVaccinated;
+
+    @ManyToOne
+    @JoinColumn(name = "CUSTOMER_ID")
+    private Customer adopter;
+
+    @Column(name = "DATE_ADOPTION")
+    private LocalDateTime dateAdoption;
+
+    @Column(name = "PROBATION")
+    private Integer probation;
 
     @OneToMany(mappedBy = "animal")
     private List<AnimalReport> animalReports;
@@ -52,6 +65,30 @@ public class Animal extends NamedEntity {
         isVaccinated = vaccinated;
     }
 
+    public Customer getAdopter() {
+        return adopter;
+    }
+
+    public void setAdopter(Customer adopter) {
+        this.adopter = adopter;
+    }
+
+    public LocalDateTime getDateAdoption() {
+        return dateAdoption;
+    }
+
+    public void setDateAdoption(LocalDateTime dateAdoption) {
+        this.dateAdoption = dateAdoption;
+    }
+
+    public ProbationType getProbation() {
+        return probation == null ? null : ProbationType.fromId(probation);
+    }
+
+    public void setProbation(ProbationType probation) {
+        this.probation = probation == null ? null : probation.getId();
+    }
+
     public List<AnimalReport> getAnimalReports() {
         return animalReports;
     }
@@ -63,8 +100,8 @@ public class Animal extends NamedEntity {
     @Override
     public String toString() {
         return "Имя: " + getName()
-                + ", возраст: " + age
-                + ", состояние здоровья: " + (isVaccinated ? "здоров(а)" : "не здоров(а)")
-                + ", наличие вакцинации: " + (isHealthy ? "вакцинирован(а)" : "не вакцинирован(а)");
+               + ", возраст: " + age
+               + ", состояние здоровья: " + (isVaccinated ? "здоров(а)" : "не здоров(а)")
+               + ", наличие вакцинации: " + (isHealthy ? "вакцинирован(а)" : "не вакцинирован(а)");
     }
 }

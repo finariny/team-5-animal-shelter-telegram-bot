@@ -1,10 +1,15 @@
 package com.example.team5animalsheltertelegrambot.service.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Dog;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.repository.animal.DogRepository;
+import com.example.team5animalsheltertelegrambot.timer.ProbationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +51,7 @@ public class DogService {
      * @param id идентификатор сущности
      * @return возвращаемая сущность
      */
-    public Optional<Dog> findById(Integer id) {
+    public Optional<Dog> findById(int id) {
         return dogRepository.findById(id);
     }
 
@@ -126,12 +131,41 @@ public class DogService {
      * @param id идентификатор удаляемой сущности
      * @return {@code true} - сущность сохранена, {@code false} - сущность не сохранена
      */
-    public Boolean deleteById(Integer id) {
+    public Boolean deleteById(int id) {
         Optional<Dog> findDogById = findById(id);
-        if (id == null || findDogById.isEmpty()) {
+        if (findDogById.isEmpty()) {
             return false;
         }
         dogRepository.deleteById(id);
         return true;
+    }
+
+    /**
+     * Регистрирует усыновление собаки посетителем, добавляет текущую дату регистрации
+     *
+     * @param dog           собака
+     * @param customer      посетитель
+     * @param probationType испытательный срок
+     * @return {@code true} - сущность обновлена, {@code false} - сущность не обновлена
+     */
+    public boolean adopt(@NotNull Dog dog, @NotNull Customer customer, ProbationType probationType) {
+        dog.setAdopter(customer);
+        dog.setDateAdoption(LocalDateTime.now());
+        dog.setProbation(probationType);
+        return this.save(dog);
+    }
+
+    /**
+     * Находит всех собак на испытательном сроке (которых усыновили)
+     *
+     * @param probationTypes Массив типов испытательного срока
+     * @return Список всех собак на испытательном сроке (которых усыновили)
+     */
+    public List<Dog> findOnProbation(ProbationType... probationTypes) {
+        List<Integer> integers = new ArrayList<>();
+        for (ProbationType probation : probationTypes) {
+            integers.add(probation.getId());
+        }
+        return dogRepository.findByProbationIn(integers);
     }
 }

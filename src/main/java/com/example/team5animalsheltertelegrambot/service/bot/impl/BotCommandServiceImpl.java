@@ -1,26 +1,27 @@
 package com.example.team5animalsheltertelegrambot.service.bot.impl;
 
-import com.example.team5animalsheltertelegrambot.configuration.CommandType;
 import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
 import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.entity.shelter.AnimalShelter;
+import com.example.team5animalsheltertelegrambot.exception.MessageException;
+import com.example.team5animalsheltertelegrambot.exception.ReportException;
 import com.example.team5animalsheltertelegrambot.listener.BotUpdatesListener;
 import com.example.team5animalsheltertelegrambot.properties.TelegramProperties;
-import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
 import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.bot.BotCommandService;
 import com.example.team5animalsheltertelegrambot.service.report.AnimalReportService;
-import com.example.team5animalsheltertelegrambot.service.report.impl.AnimalReportServiceImpl;
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.impl.FileApi;
-import com.pengrad.telegrambot.model.*;
 import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ForceReply;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
-import com.pengrad.telegrambot.request.*;
+import com.pengrad.telegrambot.request.GetFile;
+import com.pengrad.telegrambot.request.SendDocument;
+import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,27 +30,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
-
-import java.io.*;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.UUID;
 
 import static com.example.team5animalsheltertelegrambot.configuration.CommandType.*;
 import static com.example.team5animalsheltertelegrambot.service.ValidationRegularService.validateTelephone;
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-import static java.time.LocalDateTime.parse;
 
 @Service
 @RequiredArgsConstructor
@@ -66,18 +59,18 @@ public class BotCommandServiceImpl implements BotCommandService {
     private final CustomerRepository customerRepository;
 
     //Константы сообщений для проверки reply сообщений с телефоном
-    public static final String TELEPHONE = "Что бы мы могли с Вами связаться, напишите в чат ваш номер телефона.";
-    public static final String PHONE_AGAIN = "Номер телефона не прошел проверку, пожалуйста, введите еще раз";
-    public static final String VOLUNTEER_MESSAGE = "Что бы волонтер мог с Вами связаться, напишите в чат по какому вопросу вы обращаетесь.";
+    public static final String TELEPHONE = "Чтобы мы могли с Вами связаться, напишите в чат Ваш номер телефона.";
+    public static final String PHONE_AGAIN = "Номер телефона не прошел проверку, пожалуйста, введите еще раз.";
+    public static final String VOLUNTEER_MESSAGE = "Пожалуйста, напишите в чат по какому вопросу Вы обращаетесь.";
 
     private static final String MESSAGE = """
             (ID животного:)(\\s)(\\d+)(;)
-            (Рацион:)(\\s+)(\\W+)(;)
-            (Здоровье:)(\\s+)(\\W+)(;)
-            (Поведение:)(\\s+)(\\W+)(;)""";
+            (Рацион:)(\\s+)([А-я\\d\\s.,!?:]+)(;)
+            (Здоровье:)(\\s+)([А-я\\d\\s.,!?:]+)(;)
+            (Поведение:)(\\s+)([А-я\\d\\s.,!?:]+)(;)""";
 
     private static final String exampleReport = """
-            ID животного: 1; 
+            ID животного: 1;
             Рацион: ваш текст;
             Здоровье: ваш текст;
             Поведение: ваш текст;""";
@@ -85,13 +78,13 @@ public class BotCommandServiceImpl implements BotCommandService {
     private static final String infoReport = """        
             Для отчета нужна следующая информация:
             Фото животного
+            ID животного
             Рацион
             Общее самочувствие и привыкание к новому месту
             Изменение в поведении: отказ от старых привычек, приобретение новых
-            Скопируйте следующий пример. Не забудьте прикрепить фото""";
+            Скопируйте следующий пример. Не забудьте прикрепить фото!""";
     @Autowired
     private AnimalReportService animalReportService;
-
 
     @Override
     public void runAbout(@NotNull Customer customer) {
@@ -100,18 +93,33 @@ public class BotCommandServiceImpl implements BotCommandService {
                         Вас приветствует _*бот*_, который поможет сделать доброе дело\\.""",
                 customer.getLastName(),
                 customer.getFirstName());
+
         sendMessage(customer.getChatId(), welcomeMessage);
     }
 
+    /**
+     * Отправка Pdf файла с рекомендациями для будущего хозяина питомца
+     */
     @Override
-    public void runAdopt() {
-    }
+    public void runAdopt(Long chatId, AnimalShelter shelter) {
+        try {
+            byte[] pdf = Files.readAllBytes(Paths.get(
+                    Objects.requireNonNull(BotUpdatesListener.class.getResource(
+                            "/" + shelter.getSafetyAdvice())).toURI()));
+            SendDocument sendDocument = new SendDocument(chatId, pdf).fileName(shelter.getSafetyAdvice());
 
+            sendDocument.caption(
+                    "Рекомендации для будущих хозяев от " + shelter.getName() + " приюта!"
+            );
+            telegramBot.execute(sendDocument);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Вывод первого меню с кнопками выбора приюта кошек или собак
      */
-
     @Override
     public void runStart(Long chatId) {
         // Кнопки выбора приюта
@@ -156,40 +164,81 @@ public class BotCommandServiceImpl implements BotCommandService {
         runDialogAnimalShelter(chatId);
     }
 
-
     @Override
     public void runInfo(Long chatId, AnimalShelter shelter) {
-        String message = "<i>Кратко о приюте: </i>" + "<b>" + shelter.getDescription() + "</b><tg-emoji emoji-id=\"5368324170671202286\">\uD83D\uDC4D</tg-emoji>";
-        SendMessage sendMessage = new SendMessage(chatId, message);
-        sendMessage.parseMode(ParseMode.HTML);
-        telegramBot.execute(sendMessage);
-
         // Кнопки
+        InlineKeyboardButton shelterButton = new InlineKeyboardButton(SHELTER.getDescription());
+        shelterButton.callbackData(SHELTER.toString());
+
         InlineKeyboardButton locationButton = new InlineKeyboardButton(LOCATION.getDescription());
         locationButton.callbackData(LOCATION.toString());
 
         InlineKeyboardButton contactButton = new InlineKeyboardButton(CONTACT.getDescription());
         contactButton.callbackData(CONTACT.toString());
 
+        InlineKeyboardButton securityButton = new InlineKeyboardButton(SECURITY.getDescription());
+        securityButton.callbackData(SECURITY.toString());
+
+        InlineKeyboardButton safetyButton = new InlineKeyboardButton(SAFETY.getDescription());
+        safetyButton.callbackData(SAFETY.toString());
 
         // Добавление кнопок в клавиатуру
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         inlineKeyboardMarkup
+                .addRow(shelterButton)
                 .addRow(locationButton)
-                .addRow(contactButton);
+                .addRow(contactButton)
+                .addRow(securityButton)
+                .addRow(safetyButton);
 
         // Создание сообщения, добавление в него клавиатуры с рядом кнопок
-        SendMessage sendMessage1 = new SendMessage(chatId, "*Выберите дополнительное действие*");
-        sendMessage1.replyMarkup(inlineKeyboardMarkup);
+        SendMessage sendMessage = new SendMessage(chatId, "*Выберите дополнительное действие*");
+        sendMessage.replyMarkup(inlineKeyboardMarkup);
 
         // Отправка сообщения
+        prepareAndExecuteMessage(sendMessage);
+    }
 
-        prepareAndExecuteMessage(sendMessage1);
+    @Override
+    public void runShelter(Long chatId, AnimalShelter shelter) {
+        String message = "<i>Кратко о приюте: </i>" + "<b>" + shelter.getDescription() + " </b><tg-emoji emoji-id=\"5368324170671202286\">\uD83D\uDC4D</tg-emoji>";
+        SendMessage sendMessage = new SendMessage(chatId, message);
+        sendMessage.parseMode(ParseMode.HTML);
+        telegramBot.execute(sendMessage);
+    }
 
+    @Override
+    public void runSecurity(Long chatId, AnimalShelter shelter) {
+        String message = String.format("""
+                        <b>Контактные данные охраны приюта "%s":</b>
+                        %s""",
+                shelter.getName(),
+                shelter.getSecurityContact());
+        SendMessage sendMessage = new SendMessage(chatId, message);
+        sendMessage.parseMode(ParseMode.HTML);
+        telegramBot.execute(sendMessage);
+    }
+
+    @Override
+    public void runSafety(Long chatId, AnimalShelter shelter) {
+        try {
+            byte[] pdf = Files.readAllBytes(Paths.get(
+                    Objects.requireNonNull(BotUpdatesListener.class.getResource(
+                            "/" + shelter.getShelterSafetyAdvice())).toURI()));
+            SendDocument sendDocument = new SendDocument(chatId, pdf).fileName(shelter.getShelterSafetyAdvice());
+
+            sendDocument.caption(
+                    "Общие рекомендации о технике безопасности в приюте <b>\"" + shelter.getName() + "\"</b>!"
+            );
+            sendDocument.parseMode(ParseMode.HTML);
+            telegramBot.execute(sendDocument);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * Загрузка отчета
+     * Информационное меню для отправки отчета
      */
     @Override
     public void runReport(Message message) {
@@ -201,8 +250,7 @@ public class BotCommandServiceImpl implements BotCommandService {
     }
 
     @Override
-    public void saveText(Update update) {
-        Message message = update.message();
+    public void saveReport(Message message) {
         Long chatId = message.chat().id();
         String text = message.caption();
 
@@ -215,7 +263,7 @@ public class BotCommandServiceImpl implements BotCommandService {
             String wellBeing = matcher.group(11);
             String behavior = matcher.group(15);
 
-            GetFile getFileRequest = new GetFile(update.message().photo()[1].fileId());
+            GetFile getFileRequest = new GetFile(message.photo()[1].fileId());
             GetFileResponse getFileResponse = telegramBot.execute(getFileRequest);
             try {
                 File file = getFileResponse.file();
@@ -236,12 +284,16 @@ public class BotCommandServiceImpl implements BotCommandService {
                 animalReport.setDateCreate(dateTime);
                 animalReport.setAnimal(animal);
                 animalReport.setCustomer(customer);
-                System.out.println(animalReport);
+
                 animalReportService.save(animalReport);
+
                 telegramBot.execute(new SendMessage(message.chat().id(), "Отчет успешно принят!"));
             } catch (Exception e) {
-                telegramBot.execute(new SendMessage(message.chat().id(), "Загрузка не удалась!"));
+                telegramBot.execute(new SendMessage(
+                        message.chat().id(), "Загрузка не удалась! Проверьте введенные данные!"));
             }
+        } else {
+            throw new ReportException();
         }
     }
 
@@ -251,7 +303,6 @@ public class BotCommandServiceImpl implements BotCommandService {
      */
     @Override
     public void runVolunteer(Long chatId) {
-        System.out.println("после нажатия кнопки Волонтер");
         //Отправка сообщения в чат с ботом
         String customerMessage = VOLUNTEER_MESSAGE;
         SendMessage sendMessage = new SendMessage(chatId, customerMessage);
@@ -264,13 +315,11 @@ public class BotCommandServiceImpl implements BotCommandService {
      */
     @Override
     public void runTelephone(Long chatId) {
-        System.out.println("после нажатия кнопки runTelephone");
         //Отправка сообщения в чат с ботом
         SendMessage sendMessage = new SendMessage(chatId, TELEPHONE);
         sendMessage.replyMarkup(new ForceReply()); // новый диалог
         telegramBot.execute(sendMessage);
     }
-
 
     @Override
     public void saveTelephone(long chatId, String phone) {
@@ -288,29 +337,24 @@ public class BotCommandServiceImpl implements BotCommandService {
         }
     }
 
-
     /**
      * Метод отправляющий сообщение в чат волонтеров
      */
     @Override
     public void sendMessageToVolunteer(Long chatId, String text) {
         Customer customer = customerRepository.findByChatId(chatId).get();
+
         //Отправка сообщения в чат с волонтерами
-        String volunteerMessage = String.format("*%s* (@%s) зовёт волонтёра! Его номер телефона: %s. А так же прикрепленное сообщение: %s", customer.getFirstName(), chatId, customer.getPhone(), text);
-        String escapedVolunteerMessage = volunteerMessage;
-//                .replace("(", "\\(")
-//                .replace(")", "\\)")
-//                .replace("+", "\\+")
-//                .replace("!", "\\!");
-        System.out.println(escapedVolunteerMessage);
-        SendMessage sendVolunteerMessage = new SendMessage(telegramProperties.volunteerChatId(), escapedVolunteerMessage);
+        String volunteerMessage = String.format("""
+                        <b>%s</b> (@%s) зовёт волонтёра!
+                        Номер телефона: %s.
+                        Прикрепленное сообщение: %s""",
+                customer.getFirstName(), chatId, customer.getPhone(), text);
+        SendMessage sendVolunteerMessage = new SendMessage(telegramProperties.volunteerChatId(), volunteerMessage);
+        sendVolunteerMessage.parseMode(ParseMode.HTML);
         telegramBot.execute(sendVolunteerMessage);
     }
 
-
-    /**
-     * Отправка сообщения с контактами приюта
-     */
     @Override
     public void runContact(Long chatId, AnimalShelter shelter) {
         String message = "<i>Номер телефона приюта: </i><b>" + shelter.getContacts() + "</b>";
@@ -319,29 +363,6 @@ public class BotCommandServiceImpl implements BotCommandService {
         telegramBot.execute(sendMessage);
     }
 
-    /**
-     * Отправка Pdf файла с рекомендациями для будущего хозяина питомца
-     */
-    @Override
-    public void runAdvice(Long chatId, AnimalShelter shelter) {
-        try {
-            byte[] pdf = Files.readAllBytes(Paths.get(
-                    Objects.requireNonNull(BotUpdatesListener.class.getResource(
-                            "/" + shelter.getSafetyAdvice())).toURI()));
-            SendDocument sendDocument = new SendDocument(chatId, pdf).fileName(shelter.getSafetyAdvice());
-
-            sendDocument.caption(
-                    "Рекомендации для будущих хозяев от " + shelter.getName() + " приюта!"
-            );
-            telegramBot.execute(sendDocument);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Предоставление информации о локации приюта и схемы проезда к ней
-     */
     @Override
     public void runLocation(Long chatId, AnimalShelter shelter) {
         sendAddressAndWorkSchedule(chatId, shelter);
@@ -356,7 +377,6 @@ public class BotCommandServiceImpl implements BotCommandService {
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     /**
@@ -377,7 +397,6 @@ public class BotCommandServiceImpl implements BotCommandService {
         telegramBot.execute(sendMessage);
     }
 
-
     @Override
     public void sendMessage(@NotNull Long chatId, String message) {
         prepareAndExecuteMessage(new SendMessage(chatId, message));
@@ -387,7 +406,9 @@ public class BotCommandServiceImpl implements BotCommandService {
         sendMessage.parseMode(ParseMode.MarkdownV2);
         SendResponse sendResponse = telegramBot.execute(sendMessage);
         if (!sendResponse.isOk()) {
-            logger.error("Ошибка вывода сообщения: {}", sendResponse.description());
+            String msg = String.format("Ошибка вывода сообщения: %s", sendResponse.description());
+            logger.error(msg);
+            throw new MessageException(msg);
         }
     }
 
@@ -399,8 +420,8 @@ public class BotCommandServiceImpl implements BotCommandService {
         InlineKeyboardButton infoShelterButton = new InlineKeyboardButton(INFO.getDescription());
         infoShelterButton.callbackData(INFO.toString());
 
-        InlineKeyboardButton adviceButton = new InlineKeyboardButton(ADVICE.getDescription());
-        adviceButton.callbackData(ADVICE.toString());
+        InlineKeyboardButton adoptButton = new InlineKeyboardButton(ADOPT.getDescription());
+        adoptButton.callbackData(ADOPT.toString());
 
         InlineKeyboardButton reportAnimalButton = new InlineKeyboardButton(REPORT.getDescription());
         reportAnimalButton.callbackData(REPORT.toString());
@@ -415,7 +436,7 @@ public class BotCommandServiceImpl implements BotCommandService {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         inlineKeyboardMarkup
                 .addRow(infoShelterButton)
-                .addRow(adviceButton)
+                .addRow(adoptButton)
                 .addRow(reportAnimalButton)
                 .addRow(getUserPhoneButton)
                 .addRow(volunteerButton);
@@ -424,16 +445,14 @@ public class BotCommandServiceImpl implements BotCommandService {
         SendMessage sendMessage = new SendMessage(chatId, "*Выберите действие*");
         sendMessage.replyMarkup(inlineKeyboardMarkup);
 
-
         // Отправка сообщения
-
         prepareAndExecuteMessage(sendMessage);
     }
 
     /**
-     * Вспомогательный метод для отправки картинки при выборе приюта:
+     * Вспомогательный метод для отправки картинки при выборе приюта
      */
-    public void sendPhotoShelter(Long chatId, AnimalShelter shelter) {
+    private void sendPhotoShelter(Long chatId, AnimalShelter shelter) {
         try {
             byte[] photo = Files.readAllBytes(Paths.get(
                     BotUpdatesListener.class.getResource("/" + shelter.getImageName()).toURI()));
