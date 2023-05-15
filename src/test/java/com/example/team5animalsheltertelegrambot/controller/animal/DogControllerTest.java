@@ -1,10 +1,14 @@
 package com.example.team5animalsheltertelegrambot.controller.animal;
 
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.animal.DogService;
+import com.example.team5animalsheltertelegrambot.timer.ProbationType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -17,7 +21,6 @@ import java.util.Optional;
 import static com.example.team5animalsheltertelegrambot.constant.AnimalConstants.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +32,9 @@ class DogControllerTest {
 
     @MockBean
     private DogService dogService;
+
+    @MockBean
+    private CustomerRepository customerRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -199,5 +205,19 @@ class DogControllerTest {
         mockMvc.perform(
                         delete("/dog/{id}", INCORRECT_DOG.getId()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void adopt_ShouldReturn200() throws Exception {
+        Customer customer = new Customer("FirstName", "LastName", 1000000001L);
+        customer.setId(10001);
+        when(dogService.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.of(CORRECT_DOG_1));
+        when(dogService.adopt(CORRECT_DOG_1, customer, ProbationType.DEADLINE_30)).thenReturn(true);
+        when(customerRepository.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.of(customer));
+
+        final String pathAndQueryUri = String.format("/dog/adopt?dogId=%d&customerId=%d&probationType=DEADLINE_30",
+                CORRECT_DOG_1.getId(),
+                customer.getId());
+        this.mockMvc.perform(put(pathAndQueryUri)).andExpect(status().isOk());
     }
 }
