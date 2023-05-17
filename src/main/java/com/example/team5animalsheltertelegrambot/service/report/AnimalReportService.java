@@ -1,10 +1,13 @@
 package com.example.team5animalsheltertelegrambot.service.report;
 
+import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
-import com.pengrad.telegrambot.model.File;
 
-import java.util.Date;
+import java.io.File;
+import java.time.LocalDateTime;
+
 import java.util.List;
 
 
@@ -12,34 +15,37 @@ public interface AnimalReportService {
 
     /**
      * Загрузка отчета по определенным параметрам.
-     * @param customerChatId
-     * @param photoFile
-     * @param file
-     * @param diet
-     * @param wellBeing
-     * @param behavior
-     * @param filePath
-     * @param dateSendMessage
-     * @param timeDate
-     * @param reportDay
+     *
+     * @param photo      фото животного
+     * @param diet       рацион животного
+     * @param wellBeing  здоровье
+     * @param behavior   привычки
+     * @param dateCreate дата создания
+     * @param animal     животное взятое из приюта
+     * @param customer   хозяин приютившего животное
      */
-    void uploadAnimalReport(Long customerChatId,
-                            byte[] photoFile, File file,
-                            String diet, String wellBeing,
-                            String behavior, String filePath,
-                            Date dateSendMessage,
-                            Long timeDate,long reportDay);
+    void uploadAnimalReport(
+            String photo
+            , String diet
+            , String wellBeing
+            , String behavior
+            , LocalDateTime dateCreate
+            , Animal animal
+            , Customer customer);
+
 
     /**
      * Поиск отчета по id.
-     * @param id
+     *
+     * @param id идентификатор
      * @return {@link AnimalReportRepository#findById(Object)}
      */
     AnimalReport findById(Integer id);
 
     /**
      * Метод для сохранения отчета.
-     * @param report
+     *
+     * @param report отчет
      * @return {@link AnimalReportRepository#save(Object)}
      */
     AnimalReport save(AnimalReport report);
@@ -47,14 +53,14 @@ public interface AnimalReportService {
     /**
      * Метод для удаления отчета по идентификатору.
      *
-     * @param id
+     * @param id идентификатор
      */
     void remove(Integer id);
 
     /**
      * Метод для получения всех отчетов.
+     *
      * @return {@link AnimalReportRepository#findAll()}
      */
     List<AnimalReport> getAll();
-
 }

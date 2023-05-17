@@ -1,10 +1,15 @@
 package com.example.team5animalsheltertelegrambot.service.animal;
 
 import com.example.team5animalsheltertelegrambot.entity.animal.Cat;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.repository.animal.CatRepository;
+import com.example.team5animalsheltertelegrambot.timer.ProbationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +51,7 @@ public class CatService {
      * @param id идентификатор сущности
      * @return возвращаемая сущность
      */
-    public Optional<Cat> findById(Integer id) {
+    public Optional<Cat> findById(int id) {
         return catRepository.findById(id);
     }
 
@@ -126,12 +131,41 @@ public class CatService {
      * @param id идентификатор удаляемой сущности
      * @return {@code true} - сущность сохранена, {@code false} - сущность не сохранена
      */
-    public Boolean deleteById(Integer id) {
-        Optional<Cat> findTById = findById(id);
-        if (id == null || findTById.isEmpty()) {
+    public Boolean deleteById(int id) {
+        Optional<Cat> findCatById = findById(id);
+        if (findCatById.isEmpty()) {
             return false;
         }
         catRepository.deleteById(id);
         return true;
+    }
+
+    /**
+     * Регистрирует усыновление кошки посетителем, добавляет текущую дату регистрации
+     *
+     * @param cat           кошка
+     * @param customer      посетитель
+     * @param probationType испытательный срок
+     * @return {@code true} - сущность обновлена, {@code false} - сущность не обновлена
+     */
+    public boolean adopt(@NotNull Cat cat, @NotNull Customer customer, ProbationType probationType) {
+        cat.setAdopter(customer);
+        cat.setDateAdoption(LocalDateTime.now());
+        cat.setProbation(probationType);
+        return this.save(cat);
+    }
+
+    /**
+     * Находит всех кошек на испытательном сроке (которых усыновили)
+     *
+     * @param probationTypes Массив типов испытательного срока
+     * @return Список всех кошек на испытательном сроке (которых усыновили)
+     */
+    public List<Cat> findOnProbation(ProbationType... probationTypes) {
+        List<Integer> integers = new ArrayList<>();
+        for (ProbationType probation : probationTypes) {
+            integers.add(probation.getId());
+        }
+        return catRepository.findByProbationIn(integers);
     }
 }

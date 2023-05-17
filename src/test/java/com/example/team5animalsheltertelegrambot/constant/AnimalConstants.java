@@ -20,6 +20,7 @@ public class AnimalConstants {
     public static final List<Dog> LIST_OF_CORRECT_DOGS = List.of(CORRECT_DOG_1, CORRECT_DOG_2, CORRECT_DOG_3, CORRECT_DOG_4);
 
     public static final List<Cat> LIST_OF_HEALTHY_AND_UNVACCINATED_CATS = List.of(CORRECT_CAT_1, CORRECT_CAT_2);
+    public static final List<Dog> LIST_OF_HEALTHY_AND_UNVACCINATED_DOGS = List.of(CORRECT_DOG_1, CORRECT_DOG_2, CORRECT_DOG_3);
 
     public static final List<Cat> LIST_OF_HEALTHY_CATS = List.of(CORRECT_CAT_1, CORRECT_CAT_2);
     public static final List<Cat> LIST_OF_UNHEALTHY_CATS = List.of(CORRECT_CAT_3, CORRECT_CAT_4);

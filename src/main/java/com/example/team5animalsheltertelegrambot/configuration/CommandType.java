@@ -15,13 +15,20 @@ import org.springframework.lang.Nullable;
 @RequiredArgsConstructor
 public enum CommandType {
     ABOUT("/about", "О программе"),
-    ADOPT("/adopt", "Взять животное из приюта"),
+    ADOPT("/adopt", "Как взять животное из приюта"),
     CATS("/cats", "Приют для кошек"),
     DOGS("/dogs", "Приют для собак"),
     START("/start", "Добро пожаловать!"),
     INFO("/info", "Информация о приюте"),
-    REPORT("/report", "Отчет о животном"),
-    VOLUNTEER("/volunteer", "Позвать волонтера");
+    REPORT("/report", "Прислать отчет о питомце"),
+    VOLUNTEER("/volunteer", "Позвать волонтера"),
+    SHELTER("/shelter", "О приюте"),
+    LOCATION("/location","Расписание работы приюта, адрес и схема проезда"),
+    CONTACT("/contact", "Телефон приюта"),
+    PHONE("/phone", "Оставить номер телефона для связи"),
+    SECURITY("/security","Контактные данные охраны для оформления пропуска на машину"),
+    SAFETY("/safety","Общие рекомендации о технике безопасности на территории приюта");
+
 
     private final String command;
     private final String description;

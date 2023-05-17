@@ -1,15 +1,17 @@
 package com.example.team5animalsheltertelegrambot.service.report.impl;
 
 
+import com.example.team5animalsheltertelegrambot.entity.animal.Animal;
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
 import com.example.team5animalsheltertelegrambot.entity.report.AnimalReport;
 
 import com.example.team5animalsheltertelegrambot.exception.ReportException;
 import com.example.team5animalsheltertelegrambot.repository.AnimalReportRepository;
 import com.example.team5animalsheltertelegrambot.service.report.AnimalReportService;
 import org.springframework.stereotype.Service;
-import com.pengrad.telegrambot.model.File;
 
-import java.util.Date;
+import java.io.File;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,49 +23,45 @@ import java.util.Optional;
 @Service
 public class AnimalReportServiceImpl implements AnimalReportService {
 
-    private AnimalReportRepository animalReportRepository;
+    private final AnimalReportRepository animalReportRepository;
 
     public AnimalReportServiceImpl(AnimalReportRepository animalReportRepository) {
         this.animalReportRepository = animalReportRepository;
     }
 
     @Override
-    public void uploadAnimalReport(Long customerChatId,
-                                   byte[] photoFile, File file,
-                                   String diet, String wellBeing,
-                                   String behavior, String filePath,
-                                   Date dateSendMessage,
-                                   Long timeDate, long reportDay) {
+    public void uploadAnimalReport(
+             String photo
+            , String diet
+            , String wellBeing
+            , String behavior
+            , LocalDateTime dateCreate
+            , Animal animal
+            , Customer customer) {
 
         AnimalReport animalReport = new AnimalReport();
-        animalReport.setChatId(customerChatId);
-        animalReport.setPhotoFile(photoFile);
-        animalReport.setFileSize(file.fileSize());
-        animalReport.setDateTime(dateSendMessage);
+        animalReport.setPhoto(photo);
         animalReport.setDiet(diet);
         animalReport.setWellBeing(wellBeing);
         animalReport.setBehavior(behavior);
-        animalReport.setPhoto(filePath);
-        animalReport.setTimeDate(timeDate);
-        animalReport.setReportDay(reportDay);
+        animalReport.setDateCreate(dateCreate);
+        animalReport.setAnimal(animal);
+        animalReport.setCustomer(customer);
         this.animalReportRepository.save(animalReport);
     }
 
     @Override
     public AnimalReport findById(Integer id) {
-        AnimalReport animalReport = null;
-        if (id == null) {
-            System.out.println("Отчет с данным идентификатором не существует");
-        } else {
-            animalReport = this.animalReportRepository
-                    .findById(id).orElseThrow(ReportException::new);
-        }
-        return animalReport;
+        return this.animalReportRepository
+                .findById(id).orElseThrow(ReportException::new);
     }
 
     @Override
     public AnimalReport save(AnimalReport report) {
-        return this.animalReportRepository.save(report);
+        if (report != null) {
+           this.animalReportRepository.save(report);
+        }
+        return report;
     }
 
     @Override
