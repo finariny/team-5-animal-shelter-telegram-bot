@@ -1,11 +1,15 @@
 package com.example.team5animalsheltertelegrambot.controller.animal;
 
+import com.example.team5animalsheltertelegrambot.entity.person.Customer;
+import com.example.team5animalsheltertelegrambot.repository.person.CustomerRepository;
 import com.example.team5animalsheltertelegrambot.service.animal.CatService;
+import com.example.team5animalsheltertelegrambot.timer.ProbationType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,9 +21,10 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static com.example.team5animalsheltertelegrambot.constant.AnimalConstants.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CatController.class)
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +35,9 @@ class CatControllerTest {
 
     @MockBean
     private CatService catService;
+
+    @MockBean
+    private CustomerRepository customerRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -200,5 +208,19 @@ class CatControllerTest {
         mockMvc.perform(
                         delete("/cat/{id}", INCORRECT_CAT.getId()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void adopt_ShouldReturn200() throws Exception {
+        Customer customer = new Customer("FirstName", "LastName", 1000000001L);
+        customer.setId(10001);
+        when(catService.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.of(CORRECT_CAT_1));
+        when(catService.adopt(CORRECT_CAT_1, customer, ProbationType.DEADLINE_30)).thenReturn(true);
+        when(customerRepository.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.of(customer));
+
+        final String pathAndQueryUri = String.format("/cat/adopt?catId=%d&customerId=%d&probationType=DEADLINE_30",
+                CORRECT_CAT_1.getId(),
+                customer.getId());
+        this.mockMvc.perform(put(pathAndQueryUri)).andExpect(status().isOk());
     }
 }
