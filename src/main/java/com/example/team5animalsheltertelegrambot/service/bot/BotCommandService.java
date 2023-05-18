@@ -22,7 +22,7 @@ public interface BotCommandService {
     void runAbout(@NotNull Customer customer);
 
     /**
-     * Выводит информацию о том, как взять животное из приюта
+     * Отправляет PDF-файл о том, как взять животное из приюта
      *
      * @param chatId  идентификатор чата Телеграм
      * @param shelter приют для животных
@@ -87,9 +87,9 @@ public interface BotCommandService {
     /**
      * Выводит интерфейс для отчета
      *
-     * @param message сообщение для получения идентификатора чата Телеграм
+     * @param chatId идентификатор чата Телеграм
      */
-    void runReport(Message message);
+    void runReport(Long chatId);
 
     /**
      * Сохраняет отчет о питомце
