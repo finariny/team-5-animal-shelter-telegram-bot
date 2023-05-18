@@ -20,6 +20,11 @@
 
 ### [Ссылка на бота](t.me/PankTeamAnimalShelterBot)
 
+## Демо проекта
+![](../../Downloads/animal_shelter_bot_gif.gif)
+
+### [Видео-демонстрация работы бота](https://drive.google.com/drive/folders/1-C-6pCJNKzfQwpRhQ2akWGlm-j6nTa75?usp=share_link)
+
 ## Авторы
 * [**KaerLaende**](https://github.com/KaerLaende) Кирилл Вохминов
 * [**rafaelovna**](https://github.com/rafaelovna) Айкануш Арутюнян
