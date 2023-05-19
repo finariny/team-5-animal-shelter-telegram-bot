@@ -2,6 +2,21 @@
 Телеграм-бот отвечает на популярные вопросы людей о том, что нужно знать и уметь, чтобы забрать животное из приюта, 
 а также принимает ежедневные отчеты новых хозяев о том, как животное приспосабливается к новой обстановке.
 
+## Сборка и запуск проекта
+**Склонируйте проект:**
+* git clone git@github.com:finariny/team-5-animal-shelter-telegram-bot.git
+
+**Пропишите в файле _application.properties_ ваш токен телегам бота и id общего чата сотрудников:**
+* telegram.volunteer-chat-id=-000000000
+* telegram.token=************
+
+**Соберите и запустите проект в Docker контейнерах (Linux):**
+* cd team-5-animal-shelter-telegram-bot/
+* mvn clean package
+* cp target/shelter.jar deployment/docker-images/web/
+* cd deployment/
+* docker-compose -f docker-compose.yml up -d
+
 ## Команды бота
 * `/about` - присылает информацию о боте
 * `/start` - начинает общение с пользователем, предоставляет выбор приюта
