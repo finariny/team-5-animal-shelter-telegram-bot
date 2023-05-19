@@ -1,11 +1,14 @@
 version: '3.1'
 
-volumes:
-  pg_data:
-
 networks:
   shelter-net:
-    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.40.200/29
+
+volumes:
+  pg_data:
 
 services:
 
@@ -18,11 +21,28 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - ${POSTGRES_PORTS}
     restart: always
     networks:
-      - shelter-net
+      shelter-net:
+        ipv4_address: 172.20.40.202
+    ports:
+      - ${POSTGRES_PORTS}
     volumes:
       - pg_data:/shelter/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+  shelter-web:
+    container_name: shelter-web
+    image: shelter-web
+    build:
+      context: ./docker-images/web/
+    depends_on:
+      - shelter-postgresql
+    restart: always
+    networks:
+      shelter-net:
+        ipv4_address: 172.20.40.203
+    ports:
+      - ${WEB_PORTS}
+
+
