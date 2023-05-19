@@ -199,6 +199,8 @@ public class BotUpdatesListener implements UpdatesListener {
         } else if (message.replyToMessage().text().equals(VOLUNTEER_MESSAGE)) {
             // Если сообщение пришло в ответ на кнопку "Позвать волонтера" с любым текстом
             botCommandService.sendMessageToVolunteer(message.chat().id(), message.text());
+            SendMessage sendMessage = new SendMessage(message.chat().id(), "Волонтер скоро свяжется с Вами!");
+            telegramBot.execute(sendMessage);
         }
     }
 }

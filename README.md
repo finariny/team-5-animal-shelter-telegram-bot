@@ -36,7 +36,7 @@
 ### [Ссылка на бота](t.me/PankTeamAnimalShelterBot)
 
 ## Демо проекта
-![](../../Downloads/animal_shelter_bot_gif.gif)
+![](https://github.com/finariny/team-5-animal-shelter-telegram-bot/raw/master/src/main/resources/AnimalShelterBot.gif)
 
 ### [Видео-демонстрация работы бота](https://drive.google.com/drive/folders/1-C-6pCJNKzfQwpRhQ2akWGlm-j6nTa75?usp=share_link)
 
