@@ -2,6 +2,13 @@
 Телеграм-бот отвечает на популярные вопросы людей о том, что нужно знать и уметь, чтобы забрать животное из приюта, 
 а также принимает ежедневные отчеты новых хозяев о том, как животное приспосабливается к новой обстановке.
 
+## Стек технологий
+**Язык и окружение** - Java 17, Maven, Spring Boot/Web/Data/Jpa, Hibernate, GIT, REST, Swagger, PostgreSQL, Liquibase
+
+**Тестирование** - JUnit, Mockito
+
+**Прочее** - Docker
+
 ## Сборка и запуск проекта
 **Склонируйте проект:**
 * git clone git@github.com:finariny/team-5-animal-shelter-telegram-bot.git
