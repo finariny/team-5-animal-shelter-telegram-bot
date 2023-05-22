@@ -110,7 +110,7 @@ public class BotUpdatesListener implements UpdatesListener {
                         telegramBot.execute(sendMessage);
                     }
                 }
-                case REPORT -> botCommandService.runReport(callbackQuery.message());
+                case REPORT -> botCommandService.runReport(chatId);
 
             }
         } catch (Exception e) {
@@ -127,12 +127,12 @@ public class BotUpdatesListener implements UpdatesListener {
      */
     private void handleMessage(Message message) {
 
-        boolean isNewCustomer = false; // флаг нового пользователя
+        boolean isNewCustomer = false; // Флаг нового пользователя
         try {
             Long chatId = message.from().id();
             Customer customer;
 
-            // ищем пользователя в базе, если нет - сохраняем
+            // Ищем пользователя в базе, если нет - сохраняем
             if (customerRepository.existsByChatId(chatId)) {
                 customer = customerRepository.findByChatId(chatId).orElseThrow();
             } else {
@@ -142,19 +142,19 @@ public class BotUpdatesListener implements UpdatesListener {
                 );
             }
 
-            // если сообщение пришло в ответ на сообщение бота, то обрабатываем в другом методе
+            // Если сообщение пришло в ответ на сообщение бота, то обрабатываем в другом методе
             if (message.replyToMessage() != null) {
                 handleReplyToMessage(message);
                 return;
             }
 
-            // ловим сообщения с фото
+            // Ловим сообщения с фото
             if (message.photo() != null && message.caption() != null) {
                 botCommandService.saveReport(message);
                 return;
             }
 
-            // если это отдельное сообщение, то сверяем со списком команд из CommandType и запускаем выполнение при совпадении
+            // Если это отдельное сообщение, то сверяем со списком команд из CommandType и запускаем выполнение при совпадении
             String command = message.text();
             CommandType commandType = CommandType.fromCommand(command);
             if (commandType == null) {
@@ -178,7 +178,7 @@ public class BotUpdatesListener implements UpdatesListener {
                         botCommandService.runStart(chatId);
                     }
                     case INFO -> botCommandService.runInfo(chatId, animalShelter);
-                    case REPORT -> botCommandService.runReport(message);
+                    case REPORT -> botCommandService.runReport(chatId);
                     case VOLUNTEER -> botCommandService.runVolunteer(chatId);
                     case CONTACT -> botCommandService.runContact(chatId, animalShelter);
                     case LOCATION -> botCommandService.runLocation(chatId, animalShelter);
@@ -193,12 +193,14 @@ public class BotUpdatesListener implements UpdatesListener {
     }
 
     private void handleReplyToMessage(Message message) {
-        if (message.replyToMessage().text().equals(TELEPHONE) || message.replyToMessage().text().equals(PHONE_AGAIN)) {
-            //если сообщение пришло в ответ на кнопку "Телефон"
+        if (message.replyToMessage().text().equals(PHONE) || message.replyToMessage().text().equals(PHONE_AGAIN)) {
+            // Если сообщение пришло в ответ на кнопку "Телефон"
             botCommandService.saveTelephone(message.chat().id(), message.text());
         } else if (message.replyToMessage().text().equals(VOLUNTEER_MESSAGE)) {
-            //если сообщение пришло в ответ на кнопку "позвать волонтера" с любым текстом
+            // Если сообщение пришло в ответ на кнопку "Позвать волонтера" с любым текстом
             botCommandService.sendMessageToVolunteer(message.chat().id(), message.text());
+            SendMessage sendMessage = new SendMessage(message.chat().id(), "Волонтер скоро свяжется с Вами!");
+            telegramBot.execute(sendMessage);
         }
     }
 }
